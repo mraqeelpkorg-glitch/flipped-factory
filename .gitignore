@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+data/videos/raw/*
+data/videos/processed/*
+data/videos/published/*
+data/scripts/*
+data/trends.json
+data/revenue.db
+data/*.log
+*.log
+.DS_Store

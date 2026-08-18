@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flipped Factory — AI Content Dashboard</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#0a0a0f;--card:#111118;--border:#1e1e2a;--purple:#7c3aed;--pink:#ec4899;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--amber:#f59e0b;--text:#fafafa;--muted:#71717a;--surface:rgba(255,255,255,0.03)}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  
+  /* Layout */
+  .app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+  .sidebar{background:var(--card);border-right:1px solid var(--border);padding:1.5rem;display:flex;flex-direction:column;gap:0.5rem}
+  .main{padding:2rem;overflow-y:auto}
+  
+  /* Sidebar */
+  .logo{font-size:1.4rem;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:2rem;display:flex;align-items:center;gap:0.5rem}
+  .logo span{font-size:1.6rem}
+  .nav-item{padding:0.75rem 1rem;border-radius:10px;cursor:pointer;transition:all 0.2s;color:var(--muted);font-size:0.9rem;display:flex;align-items:center;gap:0.75rem}
+  .nav-item:hover,.nav-item.active{background:rgba(124,58,237,0.15);color:var(--text)}
+  .nav-item.active{border-left:3px solid var(--purple)}
+  .nav-section{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:1rem 1rem 0.5rem;font-weight:600}
+  
+  /* Cards */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:all 0.3s}
+  .card:hover{border-color:rgba(124,58,237,0.3)}
+  .card-title{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem}
+  .card-value{font-size:2rem;font-weight:800}
+  .card-sub{font-size:0.8rem;color:var(--muted);margin-top:0.25rem}
+  
+  /* Stats Grid */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+  .stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:0.75rem}
+  
+  /* Grid Layouts */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+  
+  /* Buttons */
+  .btn{padding:0.75rem 1.5rem;border-radius:10px;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:0.9rem;display:inline-flex;align-items:center;gap:0.5rem}
+  .btn-primary{background:linear-gradient(135deg,var(--purple),var(--pink));color:white}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(124,58,237,0.3)}
+  .btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+  .btn-danger{background:rgba(239,68,68,0.15);color:var(--red)}
+  .btn-success{background:rgba(16,185,129,0.15);color:var(--green)}
+  
+  /* Niche Cards */
+  .niche-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.3s}
+  .niche-card:hover,.niche-card.selected{border-color:var(--purple);background:rgba(124,58,237,0.08)}
+  .niche-emoji{font-size:2rem;margin-bottom:0.5rem}
+  .niche-name{font-weight:600;font-size:0.95rem}
+  .niche-tags{display:flex;flex-wrap:wrap;gap:0.25rem;margin-top:0.5rem}
+  .tag{font-size:0.7rem;padding:0.2rem 0.5rem;border-radius:6px;background:rgba(124,58,237,0.15);color:var(--purple)}
+  
+  /* Agent List */
+  .agent-row{display:flex;align-items:center;gap:1rem;padding:1rem;border:1px solid var(--border);border-radius:12px;margin-bottom:0.75rem;transition:all 0.2s}
+  .agent-row:hover{border-color:var(--purple);background:rgba(124,58,237,0.05)}
+  .agent-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+  .agent-info{flex:1}
+  .agent-name{font-weight:600;font-size:0.95rem}
+  .agent-desc{font-size:0.8rem;color:var(--muted);margin-top:0.2rem}
+  
+  /* Video Queue */
+  .queue-item{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--surface);border-radius:12px;margin-bottom:0.5rem}
+  .queue-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .queue-status.pending{background:var(--amber)}
+  .queue-status.done{background:var(--green)}
+  .queue-status.failed{background:var(--red)}
+  
+  /* Progress */
+  .progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:0.5rem}
+  .progress-fill{height:100%;border-radius:3px;transition:width 0.5s}
+  
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center}
+  .modal-overlay.show{display:flex}
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;width:90%;max-width:500px}
+  
+  /* Toast */
+  .toast{position:fixed;bottom:2rem;right:2rem;padding:1rem 1.5rem;border-radius:12px;color:white;font-weight:500;z-index:200;animation:slideIn 0.3s ease}
+  .toast.success{background:var(--green)}
+  .toast.error{background:var(--red)}
+  .toast.info{background:var(--purple)}
+  @keyframes slideIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  
+  /* Responsive */
+  @media(max-width:768px){
+    .app{grid-template-columns:1fr}
+    .sidebar{display:none}
+    .stats-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-2,.grid-3{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo"><span>🔄</span> Flipped Factory</div>
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">📊 Dashboard</div>
+    <div class="nav-item" onclick="showPage('niches')">🎯 Niches</div>
+    <div class="nav-item" onclick="showPage('agents')">🤖 Agents</div>
+    <div class="nav-item" onclick="showPage('create')">🎬 Create Video</div>
+    <div class="nav-section">Content</div>
+    <div class="nav-item" onclick="showPage('queue')">📋 Queue</div>
+    <div class="nav-item" onclick="showPage('published')">✅ Published</div>
+    <div class="nav-item" onclick="showPage('trends')">📈 Trends</div>
+    <div class="nav-section">System</div>
+    <div class="nav-item" onclick="showPage('settings')">⚙️ Settings</div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <!-- Dashboard Page -->
+    <div id="page-dashboard" class="page">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">Dashboard</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">AI Content Factory — Instagram Reels Automation</p>
+      
+      <div class="stats-grid">
+        <div class="card">
+          <div class="stat-icon" style="background:rgba(124,58,237,0.15)">📹</div>
+          <div class="card-title">Total Videos</div>
+          <div class="card-value" id="stat-videos">0</div>
+          <div class="card-sub" id="stat-today-videos">0 today</div>
+        </div>
+        <div class="card">
+          <div class="stat-icon" style="background:rgba(236,72,153,0.15)">📤</div>
+          <div class="card-title">Posts</div>
+          <div class="card-value" id="stat-posts">0</div>
+          <div class="card-sub" id="stat-today-posts">0 today</div>
+        </div>
+        <div class="card">
+          <div class="stat-icon" style="background:rgba(16,185,129,0.15)">👁️</div>
+          <div class="card-title">Total Views</div>
+          <div class="card-value" id="stat-views">0</div>
+          <div class="card-sub">across all posts</div>
+        </div>
+        <div class="card">
+          <div class="stat-icon" style="background:rgba(245,158,11,0.15)">💰</div>
+          <div class="card-title">Revenue</div>
+          <div class="card-value" id="stat-revenue">$0</div>
+          <div class="card-sub">total earned</div>
+        </div>
+      </div>
+      
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">📈 Niche Breakdown</h3>
+          <div id="niche-chart"></div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">🤖 Agent Performance</h3>
+          <div id="agent-chart"></div>
+        </div>
+      </div>
+      
+      <div class="card" style="margin-bottom:2rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <h3 style="font-size:1rem;font-weight:600">🕐 Daily Trend (7 Days)</h3>
+        </div>
+        <div id="daily-trend"></div>
+      </div>
+      
+      <div style="display:flex;gap:1rem">
+        <button class="btn btn-primary" onclick="runPipeline()">🚀 Run Daily Pipeline</button>
+        <button class="btn btn-secondary" onclick="refreshTrends()">📈 Refresh Trends</button>
+        <button class="btn btn-secondary" onclick="showPage('create')">🎬 Create Single Video</button>
+      </div>
+    </div>
+
+    <!-- Niches Page -->
+    <div id="page-niches" class="page" style="display:none">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">Niches</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">Select a niche to create content for</p>
+      <div class="grid-3" id="niches-grid"></div>
+    </div>
+
+    <!-- Agents Page -->
+    <div id="page-agents" class="page" style="display:none">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">AI Agents</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">12 specialized agents for different video types</p>
+      <div id="agents-list"></div>
+    </div>
+
+    <!-- Create Video Page -->
+    <div id="page-create" class="page" style="display:none">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">Create Video</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">Generate an Instagram Reel with AI</p>
+      
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="font-weight:600;margin-bottom:1rem">Select Niche</h3>
+          <select id="create-niche" style="width:100%;padding:0.75rem;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:0.9rem" onchange="loadTopics()">
+            <option value="health_fitness">💪 Health & Fitness</option>
+            <option value="finance_crypto">💰 Finance & Crypto</option>
+            <option value="tech_ai">🤖 Tech & AI</option>
+            <option value="ecommerce">🛍️ E-Commerce</option>
+            <option value="education">📚 Education</option>
+            <option value="motivation">🔥 Motivation</option>
+            <option value="food_nutrition">🥗 Food & Nutrition</option>
+            <option value="travel">✈️ Travel</option>
+            <option value="beauty_skincare">✨ Beauty & Skincare</option>
+            <option value="productivity">⚡ Productivity</option>
+          </select>
+        </div>
+        <div class="card">
+          <h3 style="font-weight:600;margin-bottom:1rem">Topic</h3>
+          <select id="create-topic" style="width:100%;padding:0.75rem;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:0.9rem"></select>
+        </div>
+      </div>
+      
+      <div class="card" style="margin-top:1.5rem">
+        <h3 style="font-weight:600;margin-bottom:1rem">Preview Script</h3>
+        <div id="script-preview" style="color:var(--muted);font-size:0.9rem">Select a niche and click Generate to see the script...</div>
+      </div>
+      
+      <div style="display:flex;gap:1rem;margin-top:1.5rem">
+        <button class="btn btn-primary" onclick="generateVideo()">🎬 Generate Video</button>
+        <button class="btn btn-secondary" onclick="loadTopics()">🔄 Refresh Topics</button>
+      </div>
+      
+      <div id="generate-result" style="margin-top:1.5rem;display:none">
+        <div class="card" style="border-color:var(--green)">
+          <h3 style="color:var(--green);font-weight:600;margin-bottom:0.5rem">✅ Video Created!</h3>
+          <p id="result-info" style="color:var(--muted);font-size:0.9rem"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Queue Page -->
+    <div id="page-queue" class="page" style="display:none">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">Video Queue</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">Videos ready to be posted</p>
+      <div id="queue-list"></div>
+    </div>
+
+    <!-- Published Page -->
+    <div id="page-published" class="page" style="display:none">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">Published</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">All posted content</p>
+      <div id="published-list"></div>
+    </div>
+
+    <!-- Trends Page -->
+    <div id="page-trends" class="page" style="display:none">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">Trends</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">Google Trends data by niche</p>
+      <button class="btn btn-primary" onclick="refreshTrends()" style="margin-bottom:1.5rem">📈 Refresh Trends</button>
+      <div id="trends-list"></div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="page-settings" class="page" style="display:none">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">Settings</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">Configure the factory</p>
+      <div class="card" style="max-width:600px">
+        <h3 style="font-weight:600;margin-bottom:1rem">Instagram</h3>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem">Set credentials in .env file or run: <code style="background:var(--surface);padding:0.2rem 0.5rem;border-radius:4px">python main.py setup</code></p>
+        <div style="display:flex;gap:1rem">
+          <button class="btn btn-secondary" onclick="testInstagram()">🔑 Test Instagram Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title" style="font-weight:600;margin-bottom:1rem"></h3>
+    <p id="modal-body" style="color:var(--muted);margin-bottom:1.5rem"></p>
+    <div style="display:flex;gap:1rem;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+let stats = {};
+let ws = null;
+
+// ─── Navigation ───────────────────────────────────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  document.getElementById('page-' + page).style.display = 'block';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  if (page === 'niches') loadNiches();
+  if (page === 'agents') loadAgents();
+  if (page === 'create') loadTopics();
+  if (page === 'trends') loadTrends();
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ─── Modal ────────────────────────────────────────────────────────────────────
+function showModal(title, body, onConfirm) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  document.getElementById('modal').classList.add('show');
+  document.getElementById('modal-confirm').onclick = () => { closeModal(); onConfirm(); };
+}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+// ─── API Calls ────────────────────────────────────────────────────────────────
+async function api(url, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  return res.json();
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
+async function loadStats() {
+  stats = await api('/api/stats');
+  document.getElementById('stat-videos').textContent = stats.total_videos || 0;
+  document.getElementById('stat-posts').textContent = stats.total_posts || 0;
+  document.getElementById('stat-views').textContent = (stats.total_views || 0).toLocaleString();
+  document.getElementById('stat-revenue').textContent = '$' + (stats.total_revenue || 0).toFixed(2);
+  document.getElementById('stat-today-videos').textContent = (stats.today_videos || 0) + ' today';
+  document.getElementById('stat-today-posts').textContent = (stats.today_posts || 0) + ' today';
+  
+  // Niche chart
+  const nicheHtml = (stats.niche_stats || []).map(n => `
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem">
+      <span style="font-size:0.85rem;min-width:120px">${n.niche.replace(/_/g, ' ')}</span>
+      <div style="flex:1;background:var(--border);border-radius:3px;height:8px">
+        <div style="width:${Math.min(100, n.count * 10)}%;height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:3px"></div>
+      </div>
+      <span style="font-size:0.8rem;color:var(--muted)">${n.count}</span>
+    </div>
+  `).join('') || '<p style="color:var(--muted)">No data yet</p>';
+  document.getElementById('niche-chart').innerHTML = nicheHtml;
+  
+  // Agent chart
+  const agentHtml = (stats.agent_stats || []).map(a => `
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem">
+      <span style="font-size:0.85rem;min-width:140px">${a.agent.replace(/_/g, ' ')}</span>
+      <div style="flex:1;background:var(--border);border-radius:3px;height:8px">
+        <div style="width:${Math.min(100, a.count * 10)}%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:3px"></div>
+      </div>
+      <span style="font-size:0.8rem;color:var(--muted)">${a.count}</span>
+    </div>
+  `).join('') || '<p style="color:var(--muted)">No data yet</p>';
+  document.getElementById('agent-chart').innerHTML = agentHtml;
+  
+  // Daily trend
+  const trendHtml = (stats.daily_trend || []).map(d => `
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
+      <span style="font-size:0.85rem;min-width:100px">${d.date}</span>
+      <div style="flex:1;background:var(--border);border-radius:3px;height:12px">
+        <div style="width:${Math.min(100, d.count * 20)}%;height:100%;background:linear-gradient(90deg,var(--amber),var(--pink));border-radius:3px"></div>
+      </div>
+      <span style="font-size:0.85rem;font-weight:600">${d.count} videos</span>
+    </div>
+  `).join('') || '<p style="color:var(--muted)">No trend data yet</p>';
+  document.getElementById('daily-trend').innerHTML = trendHtml;
+}
+
+// ─── Niches ───────────────────────────────────────────────────────────────────
+async function loadNiches() {
+  const data = await api('/api/niches');
+  const grid = document.getElementById('niches-grid');
+  grid.innerHTML = Object.entries(data.niches).map(([key, n]) => `
+    <div class="niche-card" onclick="selectNiche('${key}')">
+      <div class="niche-emoji">${n.emoji}</div>
+      <div class="niche-name">${n.name}</div>
+      <div class="niche-tags">
+        ${n.hashtags.slice(0, 4).map(t => `<span class="tag">${t}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectNiche(niche) {
+  document.getElementById('create-niche').value = niche;
+  showPage('create');
+  loadTopics();
+}
+
+// ─── Agents ───────────────────────────────────────────────────────────────────
+const AGENTS = [
+  { id: 'youtube_clipper', name: 'YouTube Clipper', desc: 'YouTube → Instagram Reels', icon: '📺', color: 'var(--red)' },
+  { id: 'podcast_clipper', name: 'Podcast Clipper', desc: 'Podcast → Short clips', icon: '🎙️', color: 'var(--purple)' },
+  { id: 'blog_to_video', name: 'Blog to Video', desc: 'Blog post → Video reel', icon: '📝', color: 'var(--cyan)' },
+  { id: 'remix_flip', name: 'Remix Flip', desc: 'Re-edit with fresh hook', icon: '🔄', color: 'var(--pink)' },
+  { id: 'dub_flip', name: 'Dub Flip', desc: 'Multi-language versions', icon: '🌍', color: 'var(--green)' },
+  { id: 'data_to_video', name: 'Data to Video', desc: 'Research → Infographic', icon: '📊', color: 'var(--amber)' },
+  { id: 'product_compilation', name: 'Product Compilation', desc: 'Top 10 product showcase', icon: '🛍️', color: 'var(--purple)' },
+  { id: 'bts_educational', name: 'BTS to Educational', desc: 'Behind-scenes → Tutorial', icon: '🎓', color: 'var(--cyan)' },
+  { id: 'trending_niche', name: 'Trending Audio', desc: 'Trending sound + niche', icon: '🎵', color: 'var(--pink)' },
+  { id: 'course_teaser', name: 'Course Teaser', desc: 'Free preview clip', icon: '📦', color: 'var(--green)' },
+  { id: 'live_highlights', name: 'Live Highlights', desc: 'Live stream → Clips', icon: '⚡', color: 'var(--amber)' },
+  { id: 'screenshot_tutorial', name: 'Screenshot Tutorial', desc: 'Screenshots → Video', icon: '📱', color: 'var(--red)' },
+];
+
+function loadAgents() {
+  document.getElementById('agents-list').innerHTML = AGENTS.map(a => `
+    <div class="agent-row">
+      <div class="agent-icon" style="background:${a.color}20;color:${a.color}">${a.icon}</div>
+      <div class="agent-info">
+        <div class="agent-name">${a.name}</div>
+        <div class="agent-desc">${a.desc}</div>
+      </div>
+      <button class="btn btn-secondary" onclick="toast('Agent: ${a.name}', 'info')" style="font-size:0.8rem;padding:0.5rem 1rem">Run</button>
+    </div>
+  `).join('');
+}
+
+// ─── Create Video ─────────────────────────────────────────────────────────────
+async function loadTopics() {
+  const niche = document.getElementById('create-niche').value;
+  const data = await api('/api/topics/' + niche);
+  const select = document.getElementById('create-topic');
+  select.innerHTML = data.topics.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+async function generateVideo() {
+  const niche = document.getElementById('create-niche').value;
+  const topic = document.getElementById('create-topic').value;
+  
+  toast('Generating video...', 'info');
+  
+  const result = await api('/api/generate', 'POST', { niche, topic });
+  
+  if (result.success) {
+    document.getElementById('generate-result').style.display = 'block';
+    document.getElementById('result-info').textContent = `Hook: "${result.hook}" | Path: ${result.path}`;
+    toast('Video created successfully!', 'success');
+    loadStats();
+  } else {
+    toast('Failed to create video', 'error');
+  }
+}
+
+// ─── Pipeline ─────────────────────────────────────────────────────────────────
+async function runPipeline() {
+  showModal('Run Pipeline', 'This will create 3 videos for today. Continue?', async () => {
+    toast('Pipeline started...', 'info');
+    const result = await api('/api/pipeline/run', 'POST', { count: 3 });
+    if (result.success) {
+      toast(`Pipeline done: ${result.videos_created.length} videos created`, 'success');
+      loadStats();
+    } else {
+      toast('Pipeline failed', 'error');
+    }
+  });
+}
+
+// ─── Trends ───────────────────────────────────────────────────────────────────
+async function loadTrends() {
+  const data = await api('/api/trends');
+  const html = (data.ranked || []).map((t, i) => `
+    <div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem;font-weight:800;color:var(--purple)">#${i+1}</span>
+        <div>
+          <div style="font-weight:600">${t.niche.replace(/_/g, ' ')}</div>
+          <div style="font-size:0.85rem;color:var(--muted)">Top keyword: ${t.top_keyword} | Score: ${t.score}</div>
+        </div>
+      </div>
+    </div>
+  `).join('') || '<p style="color:var(--muted)">No trend data. Click Refresh Trends.</p>';
+  document.getElementById('trends-list').innerHTML = html;
+}
+
+async function refreshTrends() {
+  toast('Refreshing trends...', 'info');
+  const result = await api('/api/trends/refresh', 'POST');
+  if (result.success) {
+    toast('Trends refreshed!', 'success');
+    loadTrends();
+  }
+}
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+function testInstagram() {
+  toast('Run: python main.py setup', 'info');
+}
+
+// ─── WebSocket ────────────────────────────────────────────────────────────────
+function connectWS() {
+  ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if (data.event === 'video:created') {
+      toast(`New video: ${data.data.hook}`, 'success');
+      loadStats();
+    }
+  };
+  ws.onclose = () => setTimeout(connectWS, 5000);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+loadStats();
+connectWS();
+</script>
+</body>
+</html>
