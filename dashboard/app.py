@@ -13,7 +13,7 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from engines.revenue_tracker import init_db, get_dashboard_stats, log_video, update_daily_log
@@ -86,7 +86,8 @@ async def get_hashtags_endpoint(niche: str):
 
 @app.post("/api/generate")
 async def generate_video(payload: dict):
-    """Generate a single video."""
+    """Generate a single video with full production lifecycle."""
+    import os
     niche = payload.get("niche", "health_fitness")
     topic = payload.get("topic") or select_topic(niche)
     
@@ -94,22 +95,46 @@ async def generate_video(payload: dict):
     from engines.video_builder import create_text_video
     from tools.tts_engine import text_to_speech
     from tools.video_editor import add_audio_track
+    from engines.safety_gate import check_safety, get_safety_status
+    from engines.dedup_engine import check_duplicate, register_content
+    from engines.shared_qa import run_qa
+    from engines.revenue_tracker import log_video
     
+    # Generate script
     script = generate_script_with_ai(topic, niche, duration=45)
     save_script(script, f"manual_{niche}")
     
+    full_text = f"{script.get('hook', '')} {script.get('body', '')} {script.get('cta', '')}"
+    
+    # Safety gate
+    safety = check_safety(full_text)
+    safety_status = get_safety_status(safety)
+    if safety_status == "BLOCKED":
+        return {"success": False, "error": f"Content blocked by safety gate (risk={safety.get('overall_risk', 0):.3f})"}
+    
     timestamp = datetime.now().strftime("%H%M%S")
-    base = f"data/videos/processed/manual_{niche}_{timestamp}"
+    base_dir = Path(__file__).parent.parent / "data" / "videos" / "processed"
+    base_dir.mkdir(parents=True, exist_ok=True)
+    base = str(base_dir / f"manual_{niche}_{timestamp}")
     
     video_path = f"{base}.mp4"
     create_text_video(script, video_path)
     
     audio_path = f"{base}_audio.wav"
-    text_to_speech(f"{script['hook']} {script['body']} {script['cta']}", audio_path, rate=150)
+    text_to_speech(full_text, audio_path, rate=150)
     
     final_path = f"{base}_final.mp4"
     add_audio_track(video_path, audio_path, final_path, volume=0.8)
     
+    # Dedup check
+    dup = check_duplicate(source_url=f"manual_{niche}_{topic}")
+    if dup.get("is_duplicate"):
+        return {"success": False, "error": "Duplicate content detected"}
+    
+    # QA check
+    qa = run_qa(final_path)
+    
+    # Analytics
     video_id = log_video(
         title=script.get("hook", topic)[:60],
         niche=niche,
@@ -117,16 +142,31 @@ async def generate_video(payload: dict):
         video_path=final_path
     )
     
+    # Register for dedup
+    register_content(
+        video_path=final_path,
+        source_url=f"manual_{niche}_{topic}",
+        agent_type="manual",
+    )
+    
+    # Get absolute path and file size
+    abs_path = os.path.abspath(final_path)
+    file_size = os.path.getsize(final_path) if os.path.exists(final_path) else 0
+    
     await ws_manager.broadcast({"event": "video:created", "data": {
         "niche": niche, "topic": topic, "hook": script.get("hook", ""),
-        "path": final_path, "video_id": video_id,
+        "path": abs_path, "video_id": video_id,
     }})
     
     return {
         "success": True,
         "video_id": video_id,
         "hook": script.get("hook", ""),
-        "path": final_path,
+        "path": abs_path,
+        "filename": os.path.basename(final_path),
+        "size_kb": file_size // 1024,
+        "safety": safety_status,
+        "qa": qa["overall"],
     }
 
 @app.post("/api/trends/refresh")
@@ -385,6 +425,38 @@ async def get_queue_stats_endpoint():
     return get_queue_stats()
 
 # ─── Dedup Endpoints ──────────────────────────────────────────────────────────
+# ─── Video Serving ────────────────────────────────────────────────────────────
+@app.get("/api/videos")
+async def list_videos():
+    """List all generated videos with metadata."""
+    import os
+    processed_dir = Path(__file__).parent.parent / "data" / "videos" / "processed"
+    videos = []
+    if processed_dir.exists():
+        for f in sorted(processed_dir.glob("*.mp4"), key=os.path.getmtime, reverse=True):
+            stat = os.stat(f)
+            videos.append({
+                "filename": f.name,
+                "path": str(f.resolve()),
+                "size_kb": stat.st_size // 1024,
+                "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                "play_url": f"/api/serve-video/{f.name}",
+            })
+    return {"videos": videos, "total": len(videos)}
+
+@app.get("/api/serve-video/{filename}")
+async def serve_video(filename: str):
+    """Serve a video file for browser playback."""
+    import os
+    video_path = Path(__file__).parent.parent / "data" / "videos" / "processed" / filename
+    if not video_path.exists() or not video_path.is_file():
+        return {"error": "Video not found"}
+    return FileResponse(
+        path=str(video_path),
+        media_type="video/mp4",
+        filename=filename,
+    )
+
 @app.get("/api/dedup/history")
 async def get_dedup_history(agent_type: str = None):
     """Get content hash history."""

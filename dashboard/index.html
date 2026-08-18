@@ -108,6 +108,7 @@
     <div class="nav-item" onclick="showPage('niches')">🎯 Niches</div>
     <div class="nav-item" onclick="showPage('agents')">🤖 Agents</div>
     <div class="nav-item" onclick="showPage('create')">🎬 Create Video</div>
+    <div class="nav-item" onclick="showPage('myvideos')">📹 My Videos</div>
     <div class="nav-item" onclick="showPage('podcast')">🎙️ Podcast Clipper</div>
     <div class="nav-section">Content</div>
     <div class="nav-item" onclick="showPage('queue')">📋 Queue</div>
@@ -333,9 +334,24 @@
       <div id="generate-result" style="margin-top:1.5rem;display:none">
         <div class="card" style="border-color:var(--green)">
           <h3 style="color:var(--green);font-weight:600;margin-bottom:0.5rem">✅ Video Created!</h3>
-          <p id="result-info" style="color:var(--muted);font-size:0.9rem"></p>
+          <p id="result-info" style="color:var(--muted);font-size:0.9rem;margin-bottom:1rem"></p>
+          <div id="result-meta" style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap"></div>
+          <div id="result-video-player" style="display:none;margin-bottom:1rem">
+            <video id="result-video" controls style="width:100%;max-width:360px;border-radius:12px;background:#000"></video>
+          </div>
+          <div style="display:flex;gap:0.5rem">
+            <a id="result-download" class="btn btn-secondary" download>⬇️ Download</a>
+            <button class="btn btn-secondary" onclick="showPage('myvideos')">📹 View All Videos</button>
+          </div>
         </div>
       </div>
+    </div>
+
+    <!-- My Videos Page -->
+    <div id="page-myvideos" class="page" style="display:none">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">📹 My Videos</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">All generated videos — click to play</p>
+      <div id="myvideos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem"></div>
     </div>
 
     <!-- Queue Page -->
@@ -395,15 +411,22 @@ let ws = null;
 // ─── Navigation ───────────────────────────────────────────────────────────────
 function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-  document.getElementById('page-' + page).style.display = 'block';
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) pageEl.style.display = 'block';
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  event.target.classList.add('active');
+  // Find the nav item that matches the page
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.toLowerCase().includes(page.replace('myvideos','my videos'))) {
+      n.classList.add('active');
+    }
+  });
   
   if (page === 'niches') loadNiches();
   if (page === 'agents') loadAgents();
   if (page === 'create') loadTopics();
   if (page === 'trends') loadTrends();
   if (page === 'podcast') loadPodcastStats();
+  if (page === 'myvideos') loadMyVideos();
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
@@ -541,17 +564,39 @@ async function generateVideo() {
   const niche = document.getElementById('create-niche').value;
   const topic = document.getElementById('create-topic').value;
   
-  toast('Generating video...', 'info');
+  toast('Generating video... This may take 30-60 seconds.', 'info');
+  document.getElementById('generate-result').style.display = 'none';
   
   const result = await api('/api/generate', 'POST', { niche, topic });
   
   if (result.success) {
     document.getElementById('generate-result').style.display = 'block';
-    document.getElementById('result-info').textContent = `Hook: "${result.hook}" | Path: ${result.path}`;
-    toast('Video created successfully!', 'success');
+    document.getElementById('result-info').innerHTML = `
+      <strong>Hook:</strong> "${result.hook}"<br>
+      <strong>Path:</strong> <code style="font-size:0.8rem;background:rgba(124,58,237,0.15);padding:2px 6px;border-radius:4px">${result.path}</code>
+    `;
+    document.getElementById('result-meta').innerHTML = `
+      <span class="tag">🛡️ Safety: ${result.safety || 'N/A'}</span>
+      <span class="tag">📋 QA: ${result.qa || 'N/A'}</span>
+      <span class="tag">📐 Size: ${result.size_kb || '?'} KB</span>
+      <span class="tag">🆔 ID: ${result.video_id || '?'}</span>
+    `;
+    
+    // Show video player
+    const playerDiv = document.getElementById('result-video-player');
+    const videoEl = document.getElementById('result-video');
+    playerDiv.style.display = 'block';
+    videoEl.src = `/api/serve-video/${result.filename}`;
+    videoEl.load();
+    
+    // Set download link
+    document.getElementById('result-download').href = `/api/serve-video/${result.filename}`;
+    document.getElementById('result-download').download = result.filename;
+    
+    toast('Video created! You can play it below.', 'success');
     loadStats();
   } else {
-    toast('Failed to create video', 'error');
+    toast(result.error || 'Failed to create video', 'error');
   }
 }
 
@@ -598,6 +643,34 @@ async function refreshTrends() {
 // ─── Settings ─────────────────────────────────────────────────────────────────
 function testInstagram() {
   toast('Run: python main.py setup', 'info');
+}
+
+// ─── My Videos ────────────────────────────────────────────────────────────────
+async function loadMyVideos() {
+  try {
+    const data = await api('/api/videos');
+    const grid = document.getElementById('myvideos-grid');
+    if (!data.videos || data.videos.length === 0) {
+      grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1">No videos yet. Go to Create Video to generate your first one!</p>';
+      return;
+    }
+    grid.innerHTML = data.videos.map(v => `
+      <div class="card" style="padding:0;overflow:hidden">
+        <video controls style="width:100%;aspect-ratio:9/16;background:#000;display:block" preload="metadata">
+          <source src="${v.play_url}" type="video/mp4">
+        </video>
+        <div style="padding:1rem">
+          <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem">${v.filename}</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem">${v.size_kb} KB · ${new Date(v.modified).toLocaleString()}</div>
+          <div style="display:flex;gap:0.5rem">
+            <a href="${v.play_url}" download class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem">⬇️ Download</a>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    console.error('Failed to load videos:', e);
+  }
 }
 
 // ─── Podcast Clipper ──────────────────────────────────────────────────────────
