@@ -106,12 +106,14 @@ def hash_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def compute_fingerprint(source_url: str, start: float, end: float) -> str:
+def compute_fingerprint(source_url: str, start=None, end=None) -> str:
     """
     Compute a content fingerprint from source + segment.
     Same source + same segment = same fingerprint = duplicate.
     """
-    raw = f"{source_url}|{start:.2f}|{end:.2f}"
+    s = f"{start:.2f}" if start is not None else "none"
+    e = f"{end:.2f}" if end is not None else "none"
+    raw = f"{source_url}|{s}|{e}"
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
