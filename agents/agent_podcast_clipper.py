@@ -462,6 +462,35 @@ def generate_caption(podcast_title: str, segment: dict, index: int) -> str:
         return f"Best moment number {index} from this podcast. Enjoy."
 
 
+# ─── Content Quality Check ─────────────────────────────────────────────────────
+def check_content(video_path: str, title: str = "", channel: str = "",
+                  original_duration: float = 0, clip_duration: float = 0) -> dict:
+    """
+    Run content quality and copyright check before publishing.
+    Returns {passed, report, recommendation}.
+    """
+    from engines.content_checker import full_check
+    
+    report = full_check(
+        video_path=video_path,
+        title=title,
+        channel=channel,
+        original_duration=original_duration,
+        clip_duration=clip_duration,
+        has_tts=True,
+        has_crop=True,
+    )
+    
+    passed = report["recommendation"] != "DO NOT PUBLISH"
+    
+    return {
+        "passed": passed,
+        "report": report,
+        "recommendation": report["recommendation"],
+        "score": report["overall_score"],
+    }
+
+
 # ─── Main Pipeline ────────────────────────────────────────────────────────────
 def run(
     source: str = None,
@@ -470,6 +499,7 @@ def run(
     min_segment: float = 15.0,
     max_segment: float = 60.0,
     auto_select: bool = True,
+    skip_check: bool = False,
 ) -> dict:
     """
     Full podcast clipper pipeline.
@@ -481,6 +511,7 @@ def run(
         min_segment: Minimum clip duration
         max_segment: Maximum clip duration
         auto_select: If True and no source, auto-search YouTube for best podcast
+        skip_check: If True, skip content quality check (for testing only)
     """
     logger.info(f"Podcast Clipper | Niche: {niche} | Max clips: {max_clips}")
     
@@ -513,7 +544,28 @@ def run(
     segments = detect_segments(source_path, min_segment, max_segment)
     segments = segments[:max_clips]
     
-    # Step 3: Create clips
+    # Step 3: Pre-check content before creating clips
+    content_report = None
+    if not skip_check:
+        logger.info("Running content quality & copyright check...")
+        content_report = check_content(
+            video_path=source_path,
+            title=podcast_title,
+            channel="",
+            original_duration=sum(s["duration"] for s in segments),
+            clip_duration=min(s["duration"] for s in segments) if segments else 0,
+        )
+        
+        if not content_report["passed"]:
+            return {
+                "success": False,
+                "error": f"Content check FAILED: {content_report['recommendation']}",
+                "content_report": content_report["report"],
+            }
+        
+        logger.info(f"Content check PASSED (Score: {content_report['score']}/100)")
+    
+    # Step 4: Create clips
     clips = []
     for i, seg in enumerate(segments):
         result = create_clip(source_path, seg, i + 1, niche, podcast_title)
@@ -528,4 +580,5 @@ def run(
         "total_segments": len(segments),
         "clips_created": len(clips),
         "clips": clips,
+        "content_check": content_report["report"] if content_report else None,
     }

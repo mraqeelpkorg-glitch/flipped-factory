@@ -108,6 +108,7 @@
     <div class="nav-item" onclick="showPage('niches')">🎯 Niches</div>
     <div class="nav-item" onclick="showPage('agents')">🤖 Agents</div>
     <div class="nav-item" onclick="showPage('create')">🎬 Create Video</div>
+    <div class="nav-item" onclick="showPage('podcast')">🎙️ Podcast Clipper</div>
     <div class="nav-section">Content</div>
     <div class="nav-item" onclick="showPage('queue')">📋 Queue</div>
     <div class="nav-item" onclick="showPage('published')">✅ Published</div>
@@ -193,6 +194,109 @@
     <div id="page-create" class="page" style="display:none">
       <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">Create Video</h1>
       <p style="color:var(--muted);margin-bottom:2rem">Generate an Instagram Reel with AI</p>
+
+    <!-- Podcast Clipper Page -->
+    <div id="page-podcast" class="page" style="display:none">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">🎙️ Podcast Clipper</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">Convert podcasts into Instagram Reels</p>
+
+      <!-- Stats -->
+      <div class="stats-grid" id="podcast-stats">
+        <div class="card">
+          <div class="stat-icon" style="background:rgba(124,58,237,0.15)">📥</div>
+          <div class="card-title">Sources</div>
+          <div class="card-value" id="pod-stat-sources">0</div>
+        </div>
+        <div class="card">
+          <div class="stat-icon" style="background:rgba(236,72,153,0.15)">✂️</div>
+          <div class="card-title">Clips Created</div>
+          <div class="card-value" id="pod-stat-clips">0</div>
+        </div>
+        <div class="card">
+          <div class="stat-icon" style="background:rgba(16,185,129,0.15)">✅</div>
+          <div class="card-title">Published</div>
+          <div class="card-value" id="pod-stat-published">0</div>
+        </div>
+        <div class="card">
+          <div class="stat-icon" style="background:rgba(245,158,11,0.15)">📋</div>
+          <div class="card-title">In Queue</div>
+          <div class="card-value" id="pod-stat-queued">0</div>
+        </div>
+      </div>
+
+      <!-- Run Pipeline -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <h3 style="font-weight:600;margin-bottom:1rem">🚀 Run Podcast Pipeline</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+          <div>
+            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Source (URL or leave empty for auto-search)</label>
+            <input id="pod-source" type="text" placeholder="https://youtube.com/watch?v=..." style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:0.9rem">
+          </div>
+          <div>
+            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Niche</label>
+            <select id="pod-niche" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
+              <option value="tech_ai">🤖 Tech & AI</option>
+              <option value="finance_crypto">💰 Finance & Crypto</option>
+              <option value="health_fitness">💪 Health & Fitness</option>
+              <option value="education">📚 Education</option>
+              <option value="motivation">🔥 Motivation</option>
+              <option value="ecommerce">🛒 E-commerce</option>
+              <option value="food_nutrition">🍕 Food & Nutrition</option>
+              <option value="travel">✈️ Travel</option>
+              <option value="beauty_skincare">💄 Beauty & Skincare</option>
+              <option value="productivity">⚡ Productivity</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Max Clips</label>
+            <select id="pod-max-clips" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
+              <option value="1">1 clip</option>
+              <option value="2">2 clips</option>
+              <option value="3" selected>3 clips</option>
+              <option value="5">5 clips</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+          <div>
+            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Template</label>
+            <select id="pod-template" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
+              <option value="SPEAKER_FOCUS">Speaker Focus</option>
+              <option value="SPLIT_SCREEN">Split Screen</option>
+              <option value="DYNAMIC_SPEAKER">Dynamic Speaker</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Caption Style</label>
+            <select id="pod-caption-style" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
+              <option value="default">Default</option>
+              <option value="bold">Bold</option>
+              <option value="minimal">Minimal</option>
+              <option value="highlight">Highlight</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Brand Name</label>
+            <input id="pod-brand" type="text" placeholder="Flipped Factory" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="runPodcastPipeline()" id="pod-run-btn">🎙️ Run Pipeline</button>
+      </div>
+
+      <!-- Pipeline Status -->
+      <div class="card" style="margin-bottom:1.5rem;display:none" id="pod-pipeline-status">
+        <h3 style="font-weight:600;margin-bottom:1rem">📊 Pipeline Status</h3>
+        <div id="pod-pipeline-stages"></div>
+      </div>
+
+      <!-- Clips List -->
+      <div class="card">
+        <h3 style="font-weight:600;margin-bottom:1rem">🎬 Generated Clips</h3>
+        <div id="pod-clips-list">
+          <p style="color:var(--muted)">No clips yet. Run the pipeline to generate clips.</p>
+        </div>
+      </div>
+    </div>
       
       <div class="grid-2">
         <div class="card">
@@ -299,6 +403,7 @@ function showPage(page) {
   if (page === 'agents') loadAgents();
   if (page === 'create') loadTopics();
   if (page === 'trends') loadTrends();
+  if (page === 'podcast') loadPodcastStats();
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
@@ -495,6 +600,97 @@ function testInstagram() {
   toast('Run: python main.py setup', 'info');
 }
 
+// ─── Podcast Clipper ──────────────────────────────────────────────────────────
+async function loadPodcastStats() {
+  try {
+    const data = await api('/api/podcast/stats');
+    document.getElementById('pod-stat-sources').textContent = data.total_sources || 0;
+    document.getElementById('pod-stat-clips').textContent = data.total_clips || 0;
+    document.getElementById('pod-stat-published').textContent = data.published_clips || 0;
+    document.getElementById('pod-stat-queued').textContent = data.queued_clips || 0;
+  } catch(e) {}
+}
+
+async function runPodcastPipeline() {
+  const source = document.getElementById('pod-source').value || null;
+  const niche = document.getElementById('pod-niche').value;
+  const maxClips = parseInt(document.getElementById('pod-max-clips').value);
+  const template = document.getElementById('pod-template').value;
+  const captionStyle = document.getElementById('pod-caption-style').value;
+  const brand = document.getElementById('pod-brand').value;
+
+  const btn = document.getElementById('pod-run-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Running...';
+
+  document.getElementById('pod-pipeline-status').style.display = 'block';
+  document.getElementById('pod-pipeline-stages').innerHTML = '<p style="color:var(--amber)">Pipeline starting...</p>';
+
+  try {
+    const result = await api('/api/podcast/run', 'POST', {
+      source, niche, max_clips: maxClips, template,
+      caption_style: captionStyle, brand_name: brand,
+    });
+
+    // Show stages
+    const stages = result.stages || {};
+    let stagesHtml = '';
+    for (const [name, info] of Object.entries(stages)) {
+      const icon = info.status === 'PASSED' ? '✅' : info.status === 'FAILED' ? '❌' : '⏳';
+      stagesHtml += `<div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+        <span>${icon}</span>
+        <span style="font-weight:500">${name.replace(/_/g, ' ')}</span>
+        <span style="color:var(--muted);font-size:0.8rem;margin-left:auto">${info.status}</span>
+      </div>`;
+    }
+    document.getElementById('pod-pipeline-stages').innerHTML = stagesHtml;
+
+    // Show clips
+    if (result.clips && result.clips.length > 0) {
+      let clipsHtml = '';
+      for (const clip of result.clips) {
+        const statusIcon = clip.success ? '✅' : '❌';
+        const hook = clip.caption?.caption || clip.best_hook?.text || 'No hook';
+        clipsHtml += `<div class="queue-item">
+          <div class="queue-status ${clip.success ? 'done' : 'failed'}"></div>
+          <div style="flex:1">
+            <div style="font-weight:500">${statusIcon} Clip ${clip.index} — ${clip.duration?.toFixed(1)}s (Score: ${clip.score?.toFixed(0) || 0})</div>
+            <div style="font-size:0.8rem;color:var(--muted)">${hook.substring(0, 80)}...</div>
+            ${clip.video_path ? `<div style="font-size:0.75rem;color:var(--muted);margin-top:0.25rem">📁 ${clip.video_path.split('/').pop()}</div>` : ''}
+            ${clip.qa ? `<div style="font-size:0.75rem;color:${clip.qa.ready ? 'var(--green)' : 'var(--red)'}">QA: ${clip.qa.result?.overall || 'N/A'}</div>` : ''}
+            ${clip.safety ? `<div style="font-size:0.75rem;color:var(--muted)">Safety: ${clip.safety.status}</div>` : ''}
+          </div>
+          ${clip.success ? `<button class="btn btn-success" onclick="approvePodcastClip(${clip.clip_id || 0})" style="font-size:0.75rem;padding:0.4rem 0.8rem">Approve</button>` : ''}
+        </div>`;
+      }
+      document.getElementById('pod-clips-list').innerHTML = clipsHtml;
+      toast(`${result.clips_created || 0} clips created!`, 'success');
+    } else {
+      document.getElementById('pod-clips-list').innerHTML = '<p style="color:var(--muted)">No clips generated. Try a different source or niche.</p>';
+      toast('No clips generated', 'error');
+    }
+
+    loadPodcastStats();
+  } catch(e) {
+    toast('Pipeline failed: ' + e.message, 'error');
+    document.getElementById('pod-pipeline-stages').innerHTML = '<p style="color:var(--red)">Pipeline failed</p>';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🎙️ Run Pipeline';
+}
+
+async function approvePodcastClip(clipId) {
+  if (!clipId) { toast('Clip ID not available', 'error'); return; }
+  const result = await api(`/api/podcast/clip/${clipId}/approve`, 'POST');
+  if (result.success) {
+    toast('Clip approved and queued!', 'success');
+    loadPodcastStats();
+  } else {
+    toast('Failed to approve', 'error');
+  }
+}
+
 // ─── WebSocket ────────────────────────────────────────────────────────────────
 function connectWS() {
   ws = new WebSocket(`ws://${location.host}/ws`);
@@ -510,6 +706,7 @@ function connectWS() {
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 loadStats();
+loadPodcastStats();
 connectWS();
 </script>
 </body>
