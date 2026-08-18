@@ -27,38 +27,33 @@ def trim_video(input_path: str, output_path: str, start: float, end: float) -> b
 
 
 def crop_to_vertical(input_path: str, output_path: str) -> bool:
-    """Crop horizontal video to vertical (9:16) from center."""
+    """Crop horizontal video to vertical (9:16) from center using FFmpeg."""
     try:
-        from moviepy.editor import VideoFileClip
-        import numpy as np
+        # Get video dimensions
+        probe = subprocess.run(
+            ["ffprobe", "-v", "quiet", "-select_streams", "v:0",
+             "-show_entries", "stream=width,height",
+             "-of", "csv=p=0", input_path],
+            capture_output=True, text=True, timeout=10
+        )
+        parts = probe.stdout.strip().split(",")
+        w, h = int(parts[0]), int(parts[1])
         
-        clip = VideoFileClip(input_path)
-        w, h = clip.size
-        
-        # Calculate crop dimensions for 9:16
+        # Calculate crop for 9:16
         target_ratio = 9 / 16
-        new_h = h
         new_w = int(h * target_ratio)
-        
         if new_w > w:
             new_w = w
-            new_h = int(w / target_ratio)
         
-        x_center = w / 2
-        y_center = h / 2
+        x = (w - new_w) // 2
         
-        cropped = clip.crop(
-            x1=x_center - new_w/2,
-            y1=y_center - new_h/2,
-            x2=x_center + new_w/2,
-            y2=y_center + new_h/2
-        )
-        
-        cropped = cropped.resize((1080, 1920))
-        cropped.write_videofile(output_path, codec="libx264", audio=False, logger=None)
-        cropped.close()
-        clip.close()
-        return True
+        cmd = [
+            "ffmpeg", "-i", input_path,
+            "-vf", f"crop={new_w}:{h}:{x}:0,scale=1080:1920",
+            "-c:v", "libx264", "-an", "-y", output_path
+        ]
+        result = subprocess.run(cmd, capture_output=True, timeout=60)
+        return result.returncode == 0
     except Exception as e:
         logger.error(f"Crop failed: {e}")
         return False
