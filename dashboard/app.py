@@ -291,6 +291,112 @@ async def update_podcast_settings(payload: dict):
     
     return {"success": True, "settings": payload}
 
+# ─── Agent Runner Endpoints ────────────────────────────────────────────────────
+@app.get("/api/agents")
+async def get_agents():
+    """Get list of all 12 agents."""
+    from engines.agent_runner import get_available_agents
+    return {"agents": get_available_agents()}
+
+@app.post("/api/agents/run")
+async def run_agent_endpoint(payload: dict):
+    """Run any agent through production lifecycle."""
+    from engines.agent_runner import run_agent
+    agent_type = payload.get("agent_type", "")
+    kwargs = {k: v for k, v in payload.items() if k != "agent_type" and k != "auto_publish"}
+    auto_publish = payload.get("auto_publish", False)
+
+    result = run_agent(agent_type, auto_publish=auto_publish, **kwargs)
+
+    await ws_manager.broadcast({"event": "agent:done", "data": {
+        "agent_type": agent_type,
+        "success": result.get("success", False),
+        "job_id": result.get("job_id", ""),
+    }})
+
+    return result
+
+# ─── Job Management Endpoints ──────────────────────────────────────────────────
+@app.get("/api/jobs")
+async def get_jobs(agent_type: str = None, status: str = None):
+    """Get jobs with optional filters."""
+    from engines.job_manager import get_jobs
+    return {"jobs": get_jobs(agent_type=agent_type, status=status)}
+
+@app.get("/api/jobs/{job_id}")
+async def get_job(job_id: str):
+    """Get job details."""
+    from engines.job_manager import get_job, get_job_stages
+    job = get_job(job_id)
+    stages = get_job_stages(job_id)
+    return {"job": job, "stages": stages}
+
+@app.get("/api/jobs/stats")
+async def get_job_stats():
+    """Get job queue statistics."""
+    from engines.job_manager import get_queue_stats
+    return get_queue_stats()
+
+@app.post("/api/jobs/{job_id}/cancel")
+async def cancel_job_endpoint(job_id: str):
+    """Cancel a job."""
+    from engines.job_manager import cancel_job
+    cancel_job(job_id)
+    return {"success": True}
+
+# ─── Publish Queue Endpoints ───────────────────────────────────────────────────
+@app.get("/api/production-queue")
+async def get_publish_queue():
+    """Get items pending approval."""
+    from engines.scheduler import get_pending_approvals
+    return {"queue": get_pending_approvals()}
+
+@app.get("/api/production-queue/approved")
+async def get_approved_queue():
+    """Get approved items ready for publishing."""
+    from engines.scheduler import get_approved_items
+    return {"queue": get_approved_items()}
+
+@app.post("/api/production-queue/{queue_id}/approve")
+async def approve_queue_item(queue_id: int):
+    """Approve an item for publishing."""
+    from engines.scheduler import approve_item
+    approve_item(queue_id)
+    return {"success": True}
+
+@app.post("/api/production-queue/{queue_id}/reject")
+async def reject_queue_item(queue_id: int):
+    """Reject a queued item."""
+    from engines.scheduler import reject_item
+    reject_item(queue_id)
+    return {"success": True}
+
+@app.post("/api/production-queue/publish")
+async def publish_queue_endpoint():
+    """Process the publish queue."""
+    from main import publish_queue
+    results = publish_queue()
+    return {"results": results}
+
+@app.get("/api/production-queue/stats")
+async def get_queue_stats_endpoint():
+    """Get publish queue statistics."""
+    from engines.scheduler import get_queue_stats
+    return get_queue_stats()
+
+# ─── Dedup Endpoints ──────────────────────────────────────────────────────────
+@app.get("/api/dedup/history")
+async def get_dedup_history(agent_type: str = None):
+    """Get content hash history."""
+    from engines.dedup_engine import get_content_history
+    return {"history": get_content_history(agent_type=agent_type)}
+
+@app.get("/api/dedup/check")
+async def check_dedup(source_url: str, start: float = None, end: float = None):
+    """Check if content is a duplicate."""
+    from engines.dedup_engine import check_duplicate
+    return check_duplicate(source_url, start, end)
+
 # ─── WebSocket ────────────────────────────────────────────────────────────────
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket):
