@@ -8,12 +8,12 @@
   *{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#0a0a0f;--card:#111118;--border:#1e1e2a;--purple:#7c3aed;--pink:#ec4899;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--amber:#f59e0b;--text:#fafafa;--muted:#71717a;--surface:rgba(255,255,255,0.03)}
   body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-  
+
   /* Layout */
   .app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
   .sidebar{background:var(--card);border-right:1px solid var(--border);padding:1.5rem;display:flex;flex-direction:column;gap:0.5rem}
   .main{padding:2rem;overflow-y:auto}
-  
+
   /* Sidebar */
   .logo{font-size:1.4rem;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:2rem;display:flex;align-items:center;gap:0.5rem}
   .logo span{font-size:1.6rem}
@@ -21,30 +21,32 @@
   .nav-item:hover,.nav-item.active{background:rgba(124,58,237,0.15);color:var(--text)}
   .nav-item.active{border-left:3px solid var(--purple)}
   .nav-section{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:1rem 1rem 0.5rem;font-weight:600}
-  
+
   /* Cards */
   .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:all 0.3s}
   .card:hover{border-color:rgba(124,58,237,0.3)}
   .card-title{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-bottom:0.5rem}
   .card-value{font-size:2rem;font-weight:800}
   .card-sub{font-size:0.8rem;color:var(--muted);margin-top:0.25rem}
-  
+
   /* Stats Grid */
   .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
   .stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:0.75rem}
-  
+
   /* Grid Layouts */
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
   .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
-  
+
   /* Buttons */
   .btn{padding:0.75rem 1.5rem;border-radius:10px;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:0.9rem;display:inline-flex;align-items:center;gap:0.5rem}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
   .btn-primary{background:linear-gradient(135deg,var(--purple),var(--pink));color:white}
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(124,58,237,0.3)}
+  .btn-primary:hover{box-shadow:0 10px 30px rgba(124,58,237,0.3)}
   .btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
   .btn-danger{background:rgba(239,68,68,0.15);color:var(--red)}
   .btn-success{background:rgba(16,185,129,0.15);color:var(--green)}
-  
+
   /* Niche Cards */
   .niche-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.3s}
   .niche-card:hover,.niche-card.selected{border-color:var(--purple);background:rgba(124,58,237,0.08)}
@@ -52,7 +54,7 @@
   .niche-name{font-weight:600;font-size:0.95rem}
   .niche-tags{display:flex;flex-wrap:wrap;gap:0.25rem;margin-top:0.5rem}
   .tag{font-size:0.7rem;padding:0.2rem 0.5rem;border-radius:6px;background:rgba(124,58,237,0.15);color:var(--purple)}
-  
+
   /* Agent List */
   .agent-row{display:flex;align-items:center;gap:1rem;padding:1rem;border:1px solid var(--border);border-radius:12px;margin-bottom:0.75rem;transition:all 0.2s}
   .agent-row:hover{border-color:var(--purple);background:rgba(124,58,237,0.05)}
@@ -60,35 +62,61 @@
   .agent-info{flex:1}
   .agent-name{font-weight:600;font-size:0.95rem}
   .agent-desc{font-size:0.8rem;color:var(--muted);margin-top:0.2rem}
-  
+
   /* Video Queue */
   .queue-item{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--surface);border-radius:12px;margin-bottom:0.5rem}
   .queue-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
   .queue-status.pending{background:var(--amber)}
   .queue-status.done{background:var(--green)}
   .queue-status.failed{background:var(--red)}
-  
-  /* Progress */
-  .progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:0.5rem}
-  .progress-fill{height:100%;border-radius:3px;transition:width 0.5s}
-  
+
+  /* ═══════════════ PROGRESS BAR ═══════════════ */
+  .progress-tracker{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-top:1.5rem;display:none}
+  .progress-tracker.active{display:block;animation:fadeIn 0.3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  .progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+  .progress-title{font-weight:700;font-size:1rem}
+  .progress-pct{font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+  .progress-bar-outer{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:1.5rem}
+  .progress-bar-inner{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width 0.4s ease;width:0%}
+  .progress-bar-inner.error{background:var(--red)}
+  .progress-bar-inner.done{background:var(--green)}
+
+  .steps-list{display:flex;flex-direction:column;gap:0}
+  .step-item{display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+  .step-item:last-child{border-bottom:none}
+  .step-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;transition:all 0.3s}
+  .step-icon.pending{background:rgba(255,255,255,0.05);color:var(--muted)}
+  .step-icon.active{background:rgba(124,58,237,0.2);color:var(--purple);animation:pulse 1.5s infinite}
+  .step-icon.done{background:rgba(16,185,129,0.2);color:var(--green)}
+  .step-icon.error{background:rgba(239,68,68,0.2);color:var(--red)}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,0.3)}50%{box-shadow:0 0 0 6px rgba(124,58,237,0)}}
+
+  .step-text{flex:1;font-size:0.85rem;color:var(--muted);transition:color 0.3s}
+  .step-item.active .step-text{color:var(--text);font-weight:500}
+  .step-item.done .step-text{color:var(--green)}
+  .step-item.error .step-text{color:var(--red)}
+  .step-time{font-size:0.75rem;color:var(--muted);min-width:50px;text-align:right}
+
   /* Modal */
   .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center}
   .modal-overlay.show{display:flex}
   .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;width:90%;max-width:500px}
-  
+
   /* Toast */
   .toast{position:fixed;bottom:2rem;right:2rem;padding:1rem 1.5rem;border-radius:12px;color:white;font-weight:500;z-index:200;animation:slideIn 0.3s ease}
   .toast.success{background:var(--green)}
   .toast.error{background:var(--red)}
   .toast.info{background:var(--purple)}
   @keyframes slideIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-  
+
   /* Scrollbar */
   ::-webkit-scrollbar{width:6px}
   ::-webkit-scrollbar-track{background:transparent}
   ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-  
+
   /* Responsive */
   @media(max-width:768px){
     .app{grid-template-columns:1fr}
@@ -124,7 +152,7 @@
     <div id="page-dashboard" class="page">
       <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">Dashboard</h1>
       <p style="color:var(--muted);margin-bottom:2rem">AI Content Factory — Instagram Reels Automation</p>
-      
+
       <div class="stats-grid">
         <div class="card">
           <div class="stat-icon" style="background:rgba(124,58,237,0.15)">📹</div>
@@ -151,7 +179,7 @@
           <div class="card-sub">total earned</div>
         </div>
       </div>
-      
+
       <div class="grid-2">
         <div class="card">
           <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">📈 Niche Breakdown</h3>
@@ -162,14 +190,7 @@
           <div id="agent-chart"></div>
         </div>
       </div>
-      
-      <div class="card" style="margin-bottom:2rem">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-          <h3 style="font-size:1rem;font-weight:600">🕐 Daily Trend (7 Days)</h3>
-        </div>
-        <div id="daily-trend"></div>
-      </div>
-      
+
       <div style="display:flex;gap:1rem">
         <button class="btn btn-primary" onclick="runPipeline()">🚀 Run Daily Pipeline</button>
         <button class="btn btn-secondary" onclick="refreshTrends()">📈 Refresh Trends</button>
@@ -196,109 +217,6 @@
       <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">Create Video</h1>
       <p style="color:var(--muted);margin-bottom:2rem">Generate an Instagram Reel with AI</p>
 
-    <!-- Podcast Clipper Page -->
-    <div id="page-podcast" class="page" style="display:none">
-      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">🎙️ Podcast Clipper</h1>
-      <p style="color:var(--muted);margin-bottom:2rem">Convert podcasts into Instagram Reels</p>
-
-      <!-- Stats -->
-      <div class="stats-grid" id="podcast-stats">
-        <div class="card">
-          <div class="stat-icon" style="background:rgba(124,58,237,0.15)">📥</div>
-          <div class="card-title">Sources</div>
-          <div class="card-value" id="pod-stat-sources">0</div>
-        </div>
-        <div class="card">
-          <div class="stat-icon" style="background:rgba(236,72,153,0.15)">✂️</div>
-          <div class="card-title">Clips Created</div>
-          <div class="card-value" id="pod-stat-clips">0</div>
-        </div>
-        <div class="card">
-          <div class="stat-icon" style="background:rgba(16,185,129,0.15)">✅</div>
-          <div class="card-title">Published</div>
-          <div class="card-value" id="pod-stat-published">0</div>
-        </div>
-        <div class="card">
-          <div class="stat-icon" style="background:rgba(245,158,11,0.15)">📋</div>
-          <div class="card-title">In Queue</div>
-          <div class="card-value" id="pod-stat-queued">0</div>
-        </div>
-      </div>
-
-      <!-- Run Pipeline -->
-      <div class="card" style="margin-bottom:1.5rem">
-        <h3 style="font-weight:600;margin-bottom:1rem">🚀 Run Podcast Pipeline</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
-          <div>
-            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Source (URL or leave empty for auto-search)</label>
-            <input id="pod-source" type="text" placeholder="https://youtube.com/watch?v=..." style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:0.9rem">
-          </div>
-          <div>
-            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Niche</label>
-            <select id="pod-niche" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
-              <option value="tech_ai">🤖 Tech & AI</option>
-              <option value="finance_crypto">💰 Finance & Crypto</option>
-              <option value="health_fitness">💪 Health & Fitness</option>
-              <option value="education">📚 Education</option>
-              <option value="motivation">🔥 Motivation</option>
-              <option value="ecommerce">🛒 E-commerce</option>
-              <option value="food_nutrition">🍕 Food & Nutrition</option>
-              <option value="travel">✈️ Travel</option>
-              <option value="beauty_skincare">💄 Beauty & Skincare</option>
-              <option value="productivity">⚡ Productivity</option>
-            </select>
-          </div>
-          <div>
-            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Max Clips</label>
-            <select id="pod-max-clips" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
-              <option value="1">1 clip</option>
-              <option value="2">2 clips</option>
-              <option value="3" selected>3 clips</option>
-              <option value="5">5 clips</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
-          <div>
-            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Template</label>
-            <select id="pod-template" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
-              <option value="SPEAKER_FOCUS">Speaker Focus</option>
-              <option value="SPLIT_SCREEN">Split Screen</option>
-              <option value="DYNAMIC_SPEAKER">Dynamic Speaker</option>
-            </select>
-          </div>
-          <div>
-            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Caption Style</label>
-            <select id="pod-caption-style" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
-              <option value="default">Default</option>
-              <option value="bold">Bold</option>
-              <option value="minimal">Minimal</option>
-              <option value="highlight">Highlight</option>
-            </select>
-          </div>
-          <div>
-            <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Brand Name</label>
-            <input id="pod-brand" type="text" placeholder="Flipped Factory" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)">
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="runPodcastPipeline()" id="pod-run-btn">🎙️ Run Pipeline</button>
-      </div>
-
-      <!-- Pipeline Status -->
-      <div class="card" style="margin-bottom:1.5rem;display:none" id="pod-pipeline-status">
-        <h3 style="font-weight:600;margin-bottom:1rem">📊 Pipeline Status</h3>
-        <div id="pod-pipeline-stages"></div>
-      </div>
-
-      <!-- Clips List -->
-      <div class="card">
-        <h3 style="font-weight:600;margin-bottom:1rem">🎬 Generated Clips</h3>
-        <div id="pod-clips-list">
-          <p style="color:var(--muted)">No clips yet. Run the pipeline to generate clips.</p>
-        </div>
-      </div>
-    </div>
-      
       <div class="grid-2">
         <div class="card">
           <h3 style="font-weight:600;margin-bottom:1rem">Select Niche</h3>
@@ -320,17 +238,25 @@
           <select id="create-topic" style="width:100%;padding:0.75rem;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:0.9rem"></select>
         </div>
       </div>
-      
-      <div class="card" style="margin-top:1.5rem">
-        <h3 style="font-weight:600;margin-bottom:1rem">Preview Script</h3>
-        <div id="script-preview" style="color:var(--muted);font-size:0.9rem">Select a niche and click Generate to see the script...</div>
-      </div>
-      
+
       <div style="display:flex;gap:1rem;margin-top:1.5rem">
-        <button class="btn btn-primary" onclick="generateVideo()">🎬 Generate Video</button>
+        <button class="btn btn-primary" id="generate-btn" onclick="generateVideo()">🎬 Generate Video</button>
         <button class="btn btn-secondary" onclick="loadTopics()">🔄 Refresh Topics</button>
       </div>
-      
+
+      <!-- ═══════════════ PROGRESS TRACKER ═══════════════ -->
+      <div class="progress-tracker" id="progress-tracker">
+        <div class="progress-header">
+          <span class="progress-title" id="progress-title">Generating Video...</span>
+          <span class="progress-pct" id="progress-pct">0%</span>
+        </div>
+        <div class="progress-bar-outer">
+          <div class="progress-bar-inner" id="progress-bar"></div>
+        </div>
+        <div class="steps-list" id="steps-list"></div>
+      </div>
+
+      <!-- ═══════════════ RESULT ═══════════════ -->
       <div id="generate-result" style="margin-top:1.5rem;display:none">
         <div class="card" style="border-color:var(--green)">
           <h3 style="color:var(--green);font-weight:600;margin-bottom:0.5rem">✅ Video Created!</h3>
@@ -352,6 +278,37 @@
       <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">📹 My Videos</h1>
       <p style="color:var(--muted);margin-bottom:2rem">All generated videos — click to play</p>
       <div id="myvideos-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem"></div>
+    </div>
+
+    <!-- Podcast Clipper Page -->
+    <div id="page-podcast" class="page" style="display:none">
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem">🎙️ Podcast Clipper</h1>
+      <p style="color:var(--muted);margin-bottom:2rem">Convert podcasts into Instagram Reels</p>
+      <div class="stats-grid" id="podcast-stats">
+        <div class="card"><div class="stat-icon" style="background:rgba(124,58,237,0.15)">📥</div><div class="card-title">Sources</div><div class="card-value" id="pod-stat-sources">0</div></div>
+        <div class="card"><div class="stat-icon" style="background:rgba(236,72,153,0.15)">✂️</div><div class="card-title">Clips</div><div class="card-value" id="pod-stat-clips">0</div></div>
+        <div class="card"><div class="stat-icon" style="background:rgba(16,185,129,0.15)">✅</div><div class="card-title">Published</div><div class="card-value" id="pod-stat-published">0</div></div>
+        <div class="card"><div class="stat-icon" style="background:rgba(245,158,11,0.15)">📋</div><div class="card-title">In Queue</div><div class="card-value" id="pod-stat-queued">0</div></div>
+      </div>
+      <div class="card" style="margin-bottom:1.5rem">
+        <h3 style="font-weight:600;margin-bottom:1rem">🚀 Run Pipeline</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+          <div><label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Source URL</label><input id="pod-source" type="text" placeholder="https://youtube.com/watch?v=..." style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:0.9rem"></div>
+          <div><label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Niche</label><select id="pod-niche" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)"><option value="tech_ai">🤖 Tech</option><option value="education">📚 Education</option><option value="motivation">🔥 Motivation</option><option value="health_fitness">💪 Health</option></select></div>
+          <div><label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.25rem">Max Clips</label><select id="pod-max-clips" style="width:100%;padding:0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)"><option value="3" selected>3</option><option value="5">5</option></select></div>
+        </div>
+        <button class="btn btn-primary" onclick="runPodcastPipeline()" id="pod-run-btn">🎙️ Run Pipeline</button>
+      </div>
+      <!-- Podcast Progress -->
+      <div class="progress-tracker" id="pod-progress-tracker">
+        <div class="progress-header">
+          <span class="progress-title" id="pod-progress-title">Running Pipeline...</span>
+          <span class="progress-pct" id="pod-progress-pct">0%</span>
+        </div>
+        <div class="progress-bar-outer"><div class="progress-bar-inner" id="pod-progress-bar"></div></div>
+        <div class="steps-list" id="pod-steps-list"></div>
+      </div>
+      <div class="card"><h3 style="font-weight:600;margin-bottom:1rem">🎬 Generated Clips</h3><div id="pod-clips-list"><p style="color:var(--muted)">No clips yet.</p></div></div>
     </div>
 
     <!-- Queue Page -->
@@ -382,10 +339,8 @@
       <p style="color:var(--muted);margin-bottom:2rem">Configure the factory</p>
       <div class="card" style="max-width:600px">
         <h3 style="font-weight:600;margin-bottom:1rem">Instagram</h3>
-        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem">Set credentials in .env file or run: <code style="background:var(--surface);padding:0.2rem 0.5rem;border-radius:4px">python main.py setup</code></p>
-        <div style="display:flex;gap:1rem">
-          <button class="btn btn-secondary" onclick="testInstagram()">🔑 Test Instagram Login</button>
-        </div>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem">Set credentials in .env or run: <code style="background:var(--surface);padding:0.2rem 0.5rem;border-radius:4px">python main.py setup</code></p>
+        <button class="btn btn-secondary" onclick="testInstagram()">🔑 Test Instagram Login</button>
       </div>
     </div>
   </div>
@@ -404,23 +359,25 @@
 </div>
 
 <script>
-// ─── State ────────────────────────────────────────────────────────────────────
-let stats = {};
+// ═══════════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════════
 let ws = null;
+let wsListeners = [];
+let wsProgressIntervals = {};  // job_id → interval handle (for timer fallback)
+let wsGotRealProgress = {};     // job_id → true (once backend sends real progress, kill timer)
 
-// ─── Navigation ───────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════════════
 function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
   const pageEl = document.getElementById('page-' + page);
   if (pageEl) pageEl.style.display = 'block';
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  // Find the nav item that matches the page
   document.querySelectorAll('.nav-item').forEach(n => {
-    if (n.textContent.toLowerCase().includes(page.replace('myvideos','my videos'))) {
-      n.classList.add('active');
-    }
+    if (n.textContent.toLowerCase().includes(page.replace('myvideos','my videos'))) n.classList.add('active');
   });
-  
   if (page === 'niches') loadNiches();
   if (page === 'agents') loadAgents();
   if (page === 'create') loadTopics();
@@ -429,16 +386,20 @@ function showPage(page) {
   if (page === 'myvideos') loadMyVideos();
 }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════════════════
 function toast(msg, type = 'info') {
   const t = document.createElement('div');
   t.className = 'toast ' + type;
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  setTimeout(() => t.remove(), 4000);
 }
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════════════════════
 function showModal(title, body, onConfirm) {
   document.getElementById('modal-title').textContent = title;
   document.getElementById('modal-body').textContent = body;
@@ -447,7 +408,9 @@ function showModal(title, body, onConfirm) {
 }
 function closeModal() { document.getElementById('modal').classList.remove('show'); }
 
-// ─── API Calls ────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// API
+// ═══════════════════════════════════════════════════════════════════════════════
 async function api(url, method = 'GET', body = null) {
   const opts = { method, headers: { 'Content-Type': 'application/json' } };
   if (body) opts.body = JSON.stringify(body);
@@ -455,104 +418,106 @@ async function api(url, method = 'GET', body = null) {
   return res.json();
 }
 
-// ─── Dashboard ────────────────────────────────────────────────────────────────
-async function loadStats() {
-  stats = await api('/api/stats');
-  document.getElementById('stat-videos').textContent = stats.total_videos || 0;
-  document.getElementById('stat-posts').textContent = stats.total_posts || 0;
-  document.getElementById('stat-views').textContent = (stats.total_views || 0).toLocaleString();
-  document.getElementById('stat-revenue').textContent = '$' + (stats.total_revenue || 0).toFixed(2);
-  document.getElementById('stat-today-videos').textContent = (stats.today_videos || 0) + ' today';
-  document.getElementById('stat-today-posts').textContent = (stats.today_posts || 0) + ' today';
-  
-  // Niche chart
-  const nicheHtml = (stats.niche_stats || []).map(n => `
-    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem">
-      <span style="font-size:0.85rem;min-width:120px">${n.niche.replace(/_/g, ' ')}</span>
-      <div style="flex:1;background:var(--border);border-radius:3px;height:8px">
-        <div style="width:${Math.min(100, n.count * 10)}%;height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:3px"></div>
-      </div>
-      <span style="font-size:0.8rem;color:var(--muted)">${n.count}</span>
-    </div>
-  `).join('') || '<p style="color:var(--muted)">No data yet</p>';
-  document.getElementById('niche-chart').innerHTML = nicheHtml;
-  
-  // Agent chart
-  const agentHtml = (stats.agent_stats || []).map(a => `
-    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem">
-      <span style="font-size:0.85rem;min-width:140px">${a.agent.replace(/_/g, ' ')}</span>
-      <div style="flex:1;background:var(--border);border-radius:3px;height:8px">
-        <div style="width:${Math.min(100, a.count * 10)}%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:3px"></div>
-      </div>
-      <span style="font-size:0.8rem;color:var(--muted)">${a.count}</span>
-    </div>
-  `).join('') || '<p style="color:var(--muted)">No data yet</p>';
-  document.getElementById('agent-chart').innerHTML = agentHtml;
-  
-  // Daily trend
-  const trendHtml = (stats.daily_trend || []).map(d => `
-    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
-      <span style="font-size:0.85rem;min-width:100px">${d.date}</span>
-      <div style="flex:1;background:var(--border);border-radius:3px;height:12px">
-        <div style="width:${Math.min(100, d.count * 20)}%;height:100%;background:linear-gradient(90deg,var(--amber),var(--pink));border-radius:3px"></div>
-      </div>
-      <span style="font-size:0.85rem;font-weight:600">${d.count} videos</span>
-    </div>
-  `).join('') || '<p style="color:var(--muted)">No trend data yet</p>';
-  document.getElementById('daily-trend').innerHTML = trendHtml;
-}
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROGRESS TRACKER — reusable for any task
+// ═══════════════════════════════════════════════════════════════════════════════
+const STEP_ICONS = { pending: '○', active: '◉', done: '✓', error: '✗' };
 
-// ─── Niches ───────────────────────────────────────────────────────────────────
-async function loadNiches() {
-  const data = await api('/api/niches');
-  const grid = document.getElementById('niches-grid');
-  grid.innerHTML = Object.entries(data.niches).map(([key, n]) => `
-    <div class="niche-card" onclick="selectNiche('${key}')">
-      <div class="niche-emoji">${n.emoji}</div>
-      <div class="niche-name">${n.name}</div>
-      <div class="niche-tags">
-        ${n.hashtags.slice(0, 4).map(t => `<span class="tag">${t}</span>`).join('')}
-      </div>
+function initProgress(trackerId, stepsListId, barId, pctId, titleId, steps) {
+  const tracker = document.getElementById(trackerId);
+  const stepsList = document.getElementById(stepsListId);
+  const bar = document.getElementById(barId);
+  const pct = document.getElementById(pctId);
+  const title = document.getElementById(titleId);
+
+  tracker.classList.add('active');
+  bar.style.width = '0%';
+  bar.className = 'progress-bar-inner';
+  pct.textContent = '0%';
+  title.textContent = steps[0] || 'Working...';
+
+  stepsList.innerHTML = steps.map((s, i) => `
+    <div class="step-item ${i === 0 ? 'active' : ''}" data-step="${i}">
+      <div class="step-icon ${i === 0 ? 'active' : 'pending'}" id="step-icon-${trackerId}-${i}">${STEP_ICONS.pending}</div>
+      <div class="step-text">${s}</div>
+      <div class="step-time" id="step-time-${trackerId}-${i}"></div>
     </div>
   `).join('');
+
+  return { tracker, stepsList, bar, pct, title };
 }
 
-function selectNiche(niche) {
-  document.getElementById('create-niche').value = niche;
-  showPage('create');
-  loadTopics();
+function updateProgress(trackerId, stepIndex, status, elapsed) {
+  const steps = document.querySelectorAll(`#${trackerId} .step-item`);
+  const totalSteps = steps.length;
+  const pct = Math.round(((stepIndex + (status === 'done' ? 1 : 0.5)) / totalSteps) * 100);
+
+  // Update percentage
+  document.getElementById(`progress-pct`).textContent = pct + '%';
+
+  // Update bar
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = pct + '%';
+
+  // Update step icons
+  steps.forEach((step, i) => {
+    const icon = document.getElementById(`step-icon-${trackerId}-${i}`);
+    const time = document.getElementById(`step-time-${trackerId}-${i}`);
+    if (i < stepIndex) {
+      step.className = 'step-item done';
+      icon.className = 'step-icon done';
+      icon.textContent = STEP_ICONS.done;
+    } else if (i === stepIndex) {
+      if (status === 'done') {
+        step.className = 'step-item done';
+        icon.className = 'step-icon done';
+        icon.textContent = STEP_ICONS.done;
+        if (elapsed) time.textContent = elapsed;
+      } else if (status === 'error') {
+        step.className = 'step-item error';
+        icon.className = 'step-icon error';
+        icon.textContent = STEP_ICONS.error;
+        bar.className = 'progress-bar-inner error';
+      } else {
+        step.className = 'step-item active';
+        icon.className = 'step-icon active';
+        icon.textContent = STEP_ICONS.active;
+      }
+    }
+  });
 }
 
-// ─── Agents ───────────────────────────────────────────────────────────────────
-const AGENTS = [
-  { id: 'youtube_clipper', name: 'YouTube Clipper', desc: 'YouTube → Instagram Reels', icon: '📺', color: 'var(--red)' },
-  { id: 'podcast_clipper', name: 'Podcast Clipper', desc: 'Podcast → Short clips', icon: '🎙️', color: 'var(--purple)' },
-  { id: 'blog_to_video', name: 'Blog to Video', desc: 'Blog post → Video reel', icon: '📝', color: 'var(--cyan)' },
-  { id: 'remix_flip', name: 'Remix Flip', desc: 'Re-edit with fresh hook', icon: '🔄', color: 'var(--pink)' },
-  { id: 'dub_flip', name: 'Dub Flip', desc: 'Multi-language versions', icon: '🌍', color: 'var(--green)' },
-  { id: 'data_to_video', name: 'Data to Video', desc: 'Research → Infographic', icon: '📊', color: 'var(--amber)' },
-  { id: 'product_compilation', name: 'Product Compilation', desc: 'Top 10 product showcase', icon: '🛍️', color: 'var(--purple)' },
-  { id: 'bts_educational', name: 'BTS to Educational', desc: 'Behind-scenes → Tutorial', icon: '🎓', color: 'var(--cyan)' },
-  { id: 'trending_niche', name: 'Trending Audio', desc: 'Trending sound + niche', icon: '🎵', color: 'var(--pink)' },
-  { id: 'course_teaser', name: 'Course Teaser', desc: 'Free preview clip', icon: '📦', color: 'var(--green)' },
-  { id: 'live_highlights', name: 'Live Highlights', desc: 'Live stream → Clips', icon: '⚡', color: 'var(--amber)' },
-  { id: 'screenshot_tutorial', name: 'Screenshot Tutorial', desc: 'Screenshots → Video', icon: '📱', color: 'var(--red)' },
+function finishProgress(trackerId, success, message) {
+  const tracker = document.getElementById(trackerId);
+  const bar = document.getElementById('progress-bar');
+  const pct = document.getElementById('progress-pct');
+  const title = document.getElementById('progress-title');
+
+  if (success) {
+    bar.style.width = '100%';
+    bar.className = 'progress-bar-inner done';
+    pct.textContent = '100%';
+    title.textContent = message || 'Complete!';
+  } else {
+    bar.className = 'progress-bar-inner error';
+    title.textContent = message || 'Failed!';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CREATE VIDEO — with step-by-step progress
+// ═══════════════════════════════════════════════════════════════════════════════
+const VIDEO_STEPS = [
+  'Generating AI script...',
+  'Running safety check...',
+  'Creating video visuals...',
+  'Generating TTS voiceover...',
+  'Merging audio + video...',
+  'Running QA check...',
+  'Registering content...',
+  'Done!'
 ];
 
-function loadAgents() {
-  document.getElementById('agents-list').innerHTML = AGENTS.map(a => `
-    <div class="agent-row">
-      <div class="agent-icon" style="background:${a.color}20;color:${a.color}">${a.icon}</div>
-      <div class="agent-info">
-        <div class="agent-name">${a.name}</div>
-        <div class="agent-desc">${a.desc}</div>
-      </div>
-      <button class="btn btn-secondary" onclick="toast('Agent: ${a.name}', 'info')" style="font-size:0.8rem;padding:0.5rem 1rem">Run</button>
-    </div>
-  `).join('');
-}
-
-// ─── Create Video ─────────────────────────────────────────────────────────────
 async function loadTopics() {
   const niche = document.getElementById('create-niche').value;
   const data = await api('/api/topics/' + niche);
@@ -563,117 +528,93 @@ async function loadTopics() {
 async function generateVideo() {
   const niche = document.getElementById('create-niche').value;
   const topic = document.getElementById('create-topic').value;
-  
-  toast('Generating video... This may take 30-60 seconds.', 'info');
-  document.getElementById('generate-result').style.display = 'none';
-  
-  const result = await api('/api/generate', 'POST', { niche, topic });
-  
-  if (result.success) {
-    document.getElementById('generate-result').style.display = 'block';
-    document.getElementById('result-info').innerHTML = `
-      <strong>Hook:</strong> "${result.hook}"<br>
-      <strong>Path:</strong> <code style="font-size:0.8rem;background:rgba(124,58,237,0.15);padding:2px 6px;border-radius:4px">${result.path}</code>
-    `;
-    document.getElementById('result-meta').innerHTML = `
-      <span class="tag">🛡️ Safety: ${result.safety || 'N/A'}</span>
-      <span class="tag">📋 QA: ${result.qa || 'N/A'}</span>
-      <span class="tag">📐 Size: ${result.size_kb || '?'} KB</span>
-      <span class="tag">🆔 ID: ${result.video_id || '?'}</span>
-    `;
-    
-    // Show video player
-    const playerDiv = document.getElementById('result-video-player');
-    const videoEl = document.getElementById('result-video');
-    playerDiv.style.display = 'block';
-    videoEl.src = `/api/serve-video/${result.filename}`;
-    videoEl.load();
-    
-    // Set download link
-    document.getElementById('result-download').href = `/api/serve-video/${result.filename}`;
-    document.getElementById('result-download').download = result.filename;
-    
-    toast('Video created! You can play it below.', 'success');
-    loadStats();
-  } else {
-    toast(result.error || 'Failed to create video', 'error');
-  }
-}
+  const btn = document.getElementById('generate-btn');
 
-// ─── Pipeline ─────────────────────────────────────────────────────────────────
-async function runPipeline() {
-  showModal('Run Pipeline', 'This will create 3 videos for today. Continue?', async () => {
-    toast('Pipeline started...', 'info');
-    const result = await api('/api/pipeline/run', 'POST', { count: 3 });
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+  document.getElementById('generate-result').style.display = 'none';
+
+  // Generate a unique job ID so we can match WebSocket progress events
+  const jobId = 'job_' + Date.now();
+  wsGotRealProgress[jobId] = false;
+
+  initProgress('progress-tracker', 'steps-list', 'progress-bar', 'progress-pct', 'progress-title', VIDEO_STEPS);
+
+  const t0 = Date.now();
+  function elapsed() { return ((Date.now() - t0) / 1000).toFixed(1) + 's'; }
+
+  // Timer-based fallback: only active until backend sends first real progress event
+  let currentStep = 0;
+  const stepTimers = [0, 800, 1500, 2500, 5000, 8000, 10000];
+  wsProgressIntervals[jobId] = setInterval(() => {
+    if (wsGotRealProgress[jobId]) { clearInterval(wsProgressIntervals[jobId]); return; }
+    while (currentStep < stepTimers.length - 1 && Date.now() - t0 > stepTimers[currentStep]) {
+      updateProgress('progress-tracker', currentStep, 'done', elapsed());
+      currentStep++;
+      updateProgress('progress-tracker', currentStep, 'active');
+    }
+  }, 200);
+
+  try {
+    const result = await api('/api/generate', 'POST', { niche, topic });
+
+    // Kill timer fallback — done or real progress took over
+    clearInterval(wsProgressIntervals[jobId]);
+
+    // Complete all remaining steps (in case WebSocket didn't fire for every step)
+    for (let i = 0; i < VIDEO_STEPS.length - 1; i++) {
+      updateProgress('progress-tracker', i, 'done', elapsed());
+    }
+    updateProgress('progress-tracker', VIDEO_STEPS.length - 1, 'done', elapsed());
+
     if (result.success) {
-      toast(`Pipeline done: ${result.videos_created.length} videos created`, 'success');
+      finishProgress('progress-tracker', true, 'Video Created!');
+      document.getElementById('generate-result').style.display = 'block';
+      document.getElementById('result-info').innerHTML = `
+        <strong>Hook:</strong> "${result.hook}"<br>
+        <strong>Path:</strong> <code style="font-size:0.8rem;background:rgba(124,58,237,0.15);padding:2px 6px;border-radius:4px">${result.path}</code>
+      `;
+      document.getElementById('result-meta').innerHTML = `
+        <span class="tag">🛡️ Safety: ${result.safety || 'N/A'}</span>
+        <span class="tag">📋 QA: ${result.qa || 'N/A'}</span>
+        <span class="tag">📐 Size: ${result.size_kb || '?'} KB</span>
+      `;
+      const playerDiv = document.getElementById('result-video-player');
+      const videoEl = document.getElementById('result-video');
+      playerDiv.style.display = 'block';
+      videoEl.src = `/api/serve-video/${result.filename}`;
+      videoEl.load();
+      document.getElementById('result-download').href = `/api/serve-video/${result.filename}`;
+      document.getElementById('result-download').download = result.filename;
+      toast('Video created! Play it below.', 'success');
       loadStats();
     } else {
-      toast('Pipeline failed', 'error');
+      finishProgress('progress-tracker', false, result.error || 'Failed');
+      toast(result.error || 'Failed to create video', 'error');
     }
-  });
-}
-
-// ─── Trends ───────────────────────────────────────────────────────────────────
-async function loadTrends() {
-  const data = await api('/api/trends');
-  const html = (data.ranked || []).map((t, i) => `
-    <div class="card" style="margin-bottom:1rem">
-      <div style="display:flex;align-items:center;gap:1rem">
-        <span style="font-size:1.5rem;font-weight:800;color:var(--purple)">#${i+1}</span>
-        <div>
-          <div style="font-weight:600">${t.niche.replace(/_/g, ' ')}</div>
-          <div style="font-size:0.85rem;color:var(--muted)">Top keyword: ${t.top_keyword} | Score: ${t.score}</div>
-        </div>
-      </div>
-    </div>
-  `).join('') || '<p style="color:var(--muted)">No trend data. Click Refresh Trends.</p>';
-  document.getElementById('trends-list').innerHTML = html;
-}
-
-async function refreshTrends() {
-  toast('Refreshing trends...', 'info');
-  const result = await api('/api/trends/refresh', 'POST');
-  if (result.success) {
-    toast('Trends refreshed!', 'success');
-    loadTrends();
-  }
-}
-
-// ─── Settings ─────────────────────────────────────────────────────────────────
-function testInstagram() {
-  toast('Run: python main.py setup', 'info');
-}
-
-// ─── My Videos ────────────────────────────────────────────────────────────────
-async function loadMyVideos() {
-  try {
-    const data = await api('/api/videos');
-    const grid = document.getElementById('myvideos-grid');
-    if (!data.videos || data.videos.length === 0) {
-      grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1">No videos yet. Go to Create Video to generate your first one!</p>';
-      return;
-    }
-    grid.innerHTML = data.videos.map(v => `
-      <div class="card" style="padding:0;overflow:hidden">
-        <video controls style="width:100%;aspect-ratio:9/16;background:#000;display:block" preload="metadata">
-          <source src="${v.play_url}" type="video/mp4">
-        </video>
-        <div style="padding:1rem">
-          <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem">${v.filename}</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem">${v.size_kb} KB · ${new Date(v.modified).toLocaleString()}</div>
-          <div style="display:flex;gap:0.5rem">
-            <a href="${v.play_url}" download class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem">⬇️ Download</a>
-          </div>
-        </div>
-      </div>
-    `).join('');
   } catch(e) {
-    console.error('Failed to load videos:', e);
+    clearInterval(wsProgressIntervals[jobId]);
+    finishProgress('progress-tracker', false, 'Network error');
+    toast('Error: ' + e.message, 'error');
   }
+
+  btn.disabled = false;
+  btn.textContent = '🎬 Generate Video';
 }
 
-// ─── Podcast Clipper ──────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// PODCAST — with step-by-step progress
+// ═══════════════════════════════════════════════════════════════════════════════
+const PODCAST_STEPS = [
+  'Searching/Downloading podcast...',
+  'Detecting segments...',
+  'Running content check...',
+  'Creating clips...',
+  'Generating voiceovers...',
+  'Running QA checks...',
+  'Done!'
+];
+
 async function loadPodcastStats() {
   try {
     const data = await api('/api/podcast/stats');
@@ -688,96 +629,249 @@ async function runPodcastPipeline() {
   const source = document.getElementById('pod-source').value || null;
   const niche = document.getElementById('pod-niche').value;
   const maxClips = parseInt(document.getElementById('pod-max-clips').value);
-  const template = document.getElementById('pod-template').value;
-  const captionStyle = document.getElementById('pod-caption-style').value;
-  const brand = document.getElementById('pod-brand').value;
-
   const btn = document.getElementById('pod-run-btn');
+
   btn.disabled = true;
   btn.textContent = '⏳ Running...';
 
-  document.getElementById('pod-pipeline-status').style.display = 'block';
-  document.getElementById('pod-pipeline-stages').innerHTML = '<p style="color:var(--amber)">Pipeline starting...</p>';
+  const jobId = 'pod_job_' + Date.now();
+  wsGotRealProgress[jobId] = false;
+
+  initProgress('pod-progress-tracker', 'pod-steps-list', 'pod-progress-bar', 'pod-progress-pct', 'pod-progress-title', PODCAST_STEPS);
+
+  const t0 = Date.now();
+  function elapsed() { return ((Date.now() - t0) / 1000).toFixed(1) + 's'; }
+
+  // Timer fallback — stops when backend sends real progress
+  let currentStep = 0;
+  wsProgressIntervals[jobId] = setInterval(() => {
+    if (wsGotRealProgress[jobId]) { clearInterval(wsProgressIntervals[jobId]); return; }
+    while (currentStep < PODCAST_STEPS.length - 1 && Date.now() - t0 > [0, 5000, 10000, 15000, 20000, 25000][currentStep]) {
+      updateProgress('pod-progress-tracker', currentStep, 'done', elapsed());
+      currentStep++;
+      updateProgress('pod-progress-tracker', currentStep, 'active');
+    }
+  }, 500);
 
   try {
-    const result = await api('/api/podcast/run', 'POST', {
-      source, niche, max_clips: maxClips, template,
-      caption_style: captionStyle, brand_name: brand,
-    });
+    const result = await api('/api/podcast/run', 'POST', { source, niche, max_clips: maxClips, template: 'SPEAKER_FOCUS', caption_style: 'default' });
 
-    // Show stages
-    const stages = result.stages || {};
-    let stagesHtml = '';
-    for (const [name, info] of Object.entries(stages)) {
-      const icon = info.status === 'PASSED' ? '✅' : info.status === 'FAILED' ? '❌' : '⏳';
-      stagesHtml += `<div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
-        <span>${icon}</span>
-        <span style="font-weight:500">${name.replace(/_/g, ' ')}</span>
-        <span style="color:var(--muted);font-size:0.8rem;margin-left:auto">${info.status}</span>
-      </div>`;
-    }
-    document.getElementById('pod-pipeline-stages').innerHTML = stagesHtml;
+    clearInterval(wsProgressIntervals[jobId]);
+    for (let i = 0; i < PODCAST_STEPS.length - 1; i++) updateProgress('pod-progress-tracker', i, 'done', elapsed());
+    updateProgress('pod-progress-tracker', PODCAST_STEPS.length - 1, 'done', elapsed());
 
-    // Show clips
     if (result.clips && result.clips.length > 0) {
-      let clipsHtml = '';
-      for (const clip of result.clips) {
-        const statusIcon = clip.success ? '✅' : '❌';
-        const hook = clip.caption?.caption || clip.best_hook?.text || 'No hook';
-        clipsHtml += `<div class="queue-item">
-          <div class="queue-status ${clip.success ? 'done' : 'failed'}"></div>
+      finishProgress('pod-progress-tracker', true, `${result.clips_created} clips created!`);
+      let html = result.clips.map(c => `
+        <div class="queue-item">
+          <div class="queue-status ${c.success ? 'done' : 'failed'}"></div>
           <div style="flex:1">
-            <div style="font-weight:500">${statusIcon} Clip ${clip.index} — ${clip.duration?.toFixed(1)}s (Score: ${clip.score?.toFixed(0) || 0})</div>
-            <div style="font-size:0.8rem;color:var(--muted)">${hook.substring(0, 80)}...</div>
-            ${clip.video_path ? `<div style="font-size:0.75rem;color:var(--muted);margin-top:0.25rem">📁 ${clip.video_path.split('/').pop()}</div>` : ''}
-            ${clip.qa ? `<div style="font-size:0.75rem;color:${clip.qa.ready ? 'var(--green)' : 'var(--red)'}">QA: ${clip.qa.result?.overall || 'N/A'}</div>` : ''}
-            ${clip.safety ? `<div style="font-size:0.75rem;color:var(--muted)">Safety: ${clip.safety.status}</div>` : ''}
+            <div style="font-weight:500">${c.success ? '✅' : '❌'} Clip ${c.index} — ${c.duration?.toFixed(1)}s</div>
+            ${c.qa ? `<div style="font-size:0.75rem;color:var(--muted)">QA: ${c.qa.result?.overall || 'N/A'}</div>` : ''}
           </div>
-          ${clip.success ? `<button class="btn btn-success" onclick="approvePodcastClip(${clip.clip_id || 0})" style="font-size:0.75rem;padding:0.4rem 0.8rem">Approve</button>` : ''}
-        </div>`;
-      }
-      document.getElementById('pod-clips-list').innerHTML = clipsHtml;
-      toast(`${result.clips_created || 0} clips created!`, 'success');
+        </div>
+      `).join('');
+      document.getElementById('pod-clips-list').innerHTML = html;
+      toast(`${result.clips_created} clips created!`, 'success');
     } else {
-      document.getElementById('pod-clips-list').innerHTML = '<p style="color:var(--muted)">No clips generated. Try a different source or niche.</p>';
+      finishProgress('pod-progress-tracker', false, 'No clips generated');
       toast('No clips generated', 'error');
     }
-
     loadPodcastStats();
   } catch(e) {
+    clearInterval(wsProgressIntervals[jobId]);
+    finishProgress('pod-progress-tracker', false, 'Pipeline failed');
     toast('Pipeline failed: ' + e.message, 'error');
-    document.getElementById('pod-pipeline-stages').innerHTML = '<p style="color:var(--red)">Pipeline failed</p>';
   }
 
   btn.disabled = false;
   btn.textContent = '🎙️ Run Pipeline';
 }
 
-async function approvePodcastClip(clipId) {
-  if (!clipId) { toast('Clip ID not available', 'error'); return; }
-  const result = await api(`/api/podcast/clip/${clipId}/approve`, 'POST');
-  if (result.success) {
-    toast('Clip approved and queued!', 'success');
-    loadPodcastStats();
-  } else {
-    toast('Failed to approve', 'error');
-  }
+// ═══════════════════════════════════════════════════════════════════════════════
+// DASHBOARD, NICHES, AGENTS, TRENDS, MY VIDEOS
+// ═══════════════════════════════════════════════════════════════════════════════
+async function loadStats() {
+  const stats = await api('/api/stats');
+  document.getElementById('stat-videos').textContent = stats.total_videos || 0;
+  document.getElementById('stat-posts').textContent = stats.total_posts || 0;
+  document.getElementById('stat-views').textContent = (stats.total_views || 0).toLocaleString();
+  document.getElementById('stat-revenue').textContent = '$' + (stats.total_revenue || 0).toFixed(2);
+  document.getElementById('stat-today-videos').textContent = (stats.today_videos || 0) + ' today';
+  document.getElementById('stat-today-posts').textContent = (stats.today_posts || 0) + ' today';
+  const nicheHtml = (stats.niche_stats || []).map(n => `
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem">
+      <span style="font-size:0.85rem;min-width:120px">${n.niche.replace(/_/g, ' ')}</span>
+      <div style="flex:1;background:var(--border);border-radius:3px;height:8px"><div style="width:${Math.min(100, n.count * 10)}%;height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:3px"></div></div>
+      <span style="font-size:0.8rem;color:var(--muted)">${n.count}</span>
+    </div>`).join('') || '<p style="color:var(--muted)">No data</p>';
+  document.getElementById('niche-chart').innerHTML = nicheHtml;
+  const agentHtml = (stats.agent_stats || []).map(a => `
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem">
+      <span style="font-size:0.85rem;min-width:140px">${a.agent.replace(/_/g, ' ')}</span>
+      <div style="flex:1;background:var(--border);border-radius:3px;height:8px"><div style="width:${Math.min(100, a.count * 10)}%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:3px"></div></div>
+      <span style="font-size:0.8rem;color:var(--muted)">${a.count}</span>
+    </div>`).join('') || '<p style="color:var(--muted)">No data</p>';
+  document.getElementById('agent-chart').innerHTML = agentHtml;
 }
 
-// ─── WebSocket ────────────────────────────────────────────────────────────────
+async function loadNiches() {
+  const data = await api('/api/niches');
+  document.getElementById('niches-grid').innerHTML = Object.entries(data.niches).map(([key, n]) => `
+    <div class="niche-card" onclick="selectNiche('${key}')">
+      <div class="niche-emoji">${n.emoji}</div>
+      <div class="niche-name">${n.name}</div>
+      <div class="niche-tags">${n.hashtags.slice(0, 4).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+function selectNiche(niche) { document.getElementById('create-niche').value = niche; showPage('create'); loadTopics(); }
+
+const AGENTS = [
+  { id: 'youtube_clipper', name: 'YouTube Clipper', desc: 'YouTube → Reels', icon: '📺', color: 'var(--red)' },
+  { id: 'podcast_clipper', name: 'Podcast Clipper', desc: 'Podcast → Clips', icon: '🎙️', color: 'var(--purple)' },
+  { id: 'blog_to_video', name: 'Blog to Video', desc: 'Blog → Video', icon: '📝', color: 'var(--cyan)' },
+  { id: 'remix_flip', name: 'Remix Flip', desc: 'Re-edit content', icon: '🔄', color: 'var(--pink)' },
+  { id: 'dub_flip', name: 'Dub Flip', desc: 'Multi-language', icon: '🌍', color: 'var(--green)' },
+  { id: 'data_to_video', name: 'Data to Video', desc: 'Stats → Infographic', icon: '📊', color: 'var(--amber)' },
+  { id: 'product_compilation', name: 'Product Compilation', desc: 'Top products', icon: '🛍️', color: 'var(--purple)' },
+  { id: 'bts_educational', name: 'BTS Educational', desc: 'BTS → Tutorial', icon: '🎓', color: 'var(--cyan)' },
+  { id: 'trending_niche', name: 'Trending Audio', desc: 'Trending + niche', icon: '🎵', color: 'var(--pink)' },
+  { id: 'course_teaser', name: 'Course Teaser', desc: 'Free preview', icon: '📦', color: 'var(--green)' },
+  { id: 'live_highlights', name: 'Live Highlights', desc: 'Stream → Clips', icon: '⚡', color: 'var(--amber)' },
+  { id: 'screenshot_tutorial', name: 'Screenshot Tutorial', desc: 'Screenshots → Video', icon: '📱', color: 'var(--red)' },
+];
+
+function loadAgents() {
+  document.getElementById('agents-list').innerHTML = AGENTS.map(a => `
+    <div class="agent-row">
+      <div class="agent-icon" style="background:${a.color}20;color:${a.color}">${a.icon}</div>
+      <div class="agent-info"><div class="agent-name">${a.name}</div><div class="agent-desc">${a.desc}</div></div>
+      <button class="btn btn-secondary" onclick="runAgentWithProgress('${a.id}', '${a.name}')" style="font-size:0.8rem;padding:0.5rem 1rem">▶ Run</button>
+    </div>`).join('');
+}
+
+async function runAgentWithProgress(agentId, agentName) {
+  showPage('create');
+  const btn = document.getElementById('generate-btn');
+  btn.disabled = true;
+  btn.textContent = `⏳ Running ${agentName}...`;
+
+  const steps = ['Initializing agent...', 'Running agent pipeline...', 'Safety check...', 'QA check...', 'Registering...', 'Done!'];
+  initProgress('progress-tracker', 'steps-list', 'progress-bar', 'progress-pct', 'progress-title', steps);
+
+  const t0 = Date.now();
+  function elapsed() { return ((Date.now() - t0) / 1000).toFixed(1) + 's'; }
+
+  let currentStep = 0;
+  const progressInterval = setInterval(() => {
+    while (currentStep < steps.length - 1 && Date.now() - t0 > [0, 2000, 5000, 8000, 10000][currentStep]) {
+      updateProgress('progress-tracker', currentStep, 'done', elapsed());
+      currentStep++;
+      updateProgress('progress-tracker', currentStep, 'active');
+    }
+  }, 300);
+
+  try {
+    const result = await api('/api/agents/run', 'POST', { agent_type: agentId, data_source: 'Test content for agent', niche: 'tech_ai' });
+    clearInterval(progressInterval);
+    for (let i = currentStep; i < steps.length - 1; i++) updateProgress('progress-tracker', i, 'done', elapsed());
+    updateProgress('progress-tracker', steps.length - 1, 'done', elapsed());
+
+    if (result.success) {
+      finishProgress('progress-tracker', true, `${agentName} complete!`);
+      if (result.video_path) {
+        document.getElementById('generate-result').style.display = 'block';
+        document.getElementById('result-info').innerHTML = `<strong>Agent:</strong> ${agentName}<br><strong>Path:</strong> <code style="font-size:0.8rem;background:rgba(124,58,237,0.15);padding:2px 6px;border-radius:4px">${result.video_path}</code>`;
+      }
+      toast(`${agentName} completed!`, 'success');
+    } else {
+      finishProgress('progress-tracker', false, result.error || 'Failed');
+      toast(`${agentName} failed: ${result.error}`, 'error');
+    }
+  } catch(e) {
+    clearInterval(progressInterval);
+    finishProgress('progress-tracker', false, 'Error');
+    toast('Error: ' + e.message, 'error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🎬 Generate Video';
+}
+
+async function loadTrends() {
+  const data = await api('/api/trends');
+  document.getElementById('trends-list').innerHTML = (data.ranked || []).map((t, i) => `
+    <div class="card" style="margin-bottom:1rem"><div style="display:flex;align-items:center;gap:1rem">
+      <span style="font-size:1.5rem;font-weight:800;color:var(--purple)">#${i+1}</span>
+      <div><div style="font-weight:600">${t.niche.replace(/_/g, ' ')}</div><div style="font-size:0.85rem;color:var(--muted)">${t.top_keyword} | Score: ${t.score}</div></div>
+    </div></div>`).join('') || '<p style="color:var(--muted)">No trend data.</p>';
+}
+
+async function refreshTrends() { toast('Refreshing trends...', 'info'); const r = await api('/api/trends/refresh', 'POST'); if (r.success) { toast('Trends refreshed!', 'success'); loadTrends(); } }
+
+async function loadMyVideos() {
+  try {
+    const data = await api('/api/videos');
+    const grid = document.getElementById('myvideos-grid');
+    if (!data.videos || data.videos.length === 0) { grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1">No videos yet.</p>'; return; }
+    grid.innerHTML = data.videos.map(v => `
+      <div class="card" style="padding:0;overflow:hidden">
+        <video controls style="width:100%;aspect-ratio:9/16;background:#000;display:block" preload="metadata"><source src="${v.play_url}" type="video/mp4"></video>
+        <div style="padding:1rem">
+          <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem">${v.filename}</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem">${v.size_kb} KB · ${new Date(v.modified).toLocaleString()}</div>
+          <a href="${v.play_url}" download class="btn btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.8rem">⬇️ Download</a>
+        </div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+function testInstagram() { toast('Run: python main.py setup', 'info'); }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PIPELINE
+// ═══════════════════════════════════════════════════════════════════════════════
+async function runPipeline() {
+  showModal('Run Pipeline', 'Create 3 videos for today?', async () => {
+    toast('Pipeline started...', 'info');
+    const r = await api('/api/pipeline/run', 'POST', { count: 3 });
+    if (r.success) toast(`Pipeline done: ${r.videos_created?.length || 0} videos`, 'success');
+    else toast('Pipeline failed', 'error');
+    loadStats();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// WEBSOCKET
+// ═══════════════════════════════════════════════════════════════════════════════
 function connectWS() {
   ws = new WebSocket(`ws://${location.host}/ws`);
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
-    if (data.event === 'video:created') {
-      toast(`New video: ${data.data.hook}`, 'success');
+    if (data.event === 'video:created') { toast(`New video: ${data.data.hook}`, 'success'); loadStats(); }
+    if (data.event === 'progress') {
+      const d = data.data;
+      const trackerId = d.tracker || 'progress-tracker';
+      const job = d.job || '';
+      if (d.step !== undefined && d.status) {
+        // Real backend progress — update tracker directly
+        if (job) wsGotRealProgress[job] = true;
+        updateProgress(trackerId, d.step, d.status, null);
+      }
+      if (d.done) finishProgress(trackerId, d.success !== false);
+    }
+    if (data.event === 'pipeline:done') {
+      toast(`Pipeline complete: ${data.data.videos_created} videos`, 'success');
       loadStats();
     }
   };
   ws.onclose = () => setTimeout(connectWS, 5000);
 }
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════════
 loadStats();
 loadPodcastStats();
 connectWS();

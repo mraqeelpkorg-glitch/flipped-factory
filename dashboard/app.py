@@ -86,11 +86,12 @@ async def get_hashtags_endpoint(niche: str):
 
 @app.post("/api/generate")
 async def generate_video(payload: dict):
-    """Generate a single video with full production lifecycle."""
-    import os
+    """Generate a single video with full production lifecycle + real-time progress."""
+    import os, time
     niche = payload.get("niche", "health_fitness")
     topic = payload.get("topic") or select_topic(niche)
-    
+    job_id = f"gen_{niche}_{int(time.time())}"
+
     from engines.content_creator import generate_script_with_ai, save_script
     from engines.video_builder import create_text_video
     from tools.tts_engine import text_to_speech
@@ -99,65 +100,90 @@ async def generate_video(payload: dict):
     from engines.dedup_engine import check_duplicate, register_content
     from engines.shared_qa import run_qa
     from engines.revenue_tracker import log_video
-    
-    # Generate script
+
+    STEP_NAMES = ["script", "safety", "video", "tts", "merge", "qa", "register", "done"]
+    async def emit_step(idx, status="active"):
+        await ws_manager.broadcast({"event": "progress", "data": {
+            "tracker": "progress-tracker", "job": job_id,
+            "step": idx, "status": status,
+            "step_name": STEP_NAMES[idx] if idx < len(STEP_NAMES) else "",
+            "total_steps": len(STEP_NAMES),
+        }})
+
+    # Step 0 — Script
+    await emit_step(0, "active")
     script = generate_script_with_ai(topic, niche, duration=45)
     save_script(script, f"manual_{niche}")
-    
     full_text = f"{script.get('hook', '')} {script.get('body', '')} {script.get('cta', '')}"
-    
-    # Safety gate
+    await emit_step(0, "done")
+
+    # Step 1 — Safety
+    await emit_step(1, "active")
     safety = check_safety(full_text)
     safety_status = get_safety_status(safety)
+    await emit_step(1, "done")
     if safety_status == "BLOCKED":
+        await emit_step(1, "error")
         return {"success": False, "error": f"Content blocked by safety gate (risk={safety.get('overall_risk', 0):.3f})"}
-    
+
+    # Step 2 — Video
+    await emit_step(2, "active")
     timestamp = datetime.now().strftime("%H%M%S")
     base_dir = Path(__file__).parent.parent / "data" / "videos" / "processed"
     base_dir.mkdir(parents=True, exist_ok=True)
     base = str(base_dir / f"manual_{niche}_{timestamp}")
-    
     video_path = f"{base}.mp4"
     create_text_video(script, video_path)
-    
+    await emit_step(2, "done")
+
+    # Step 3 — TTS
+    await emit_step(3, "active")
     audio_path = f"{base}_audio.wav"
     text_to_speech(full_text, audio_path, rate=150)
-    
+    await emit_step(3, "done")
+
+    # Step 4 — Merge
+    await emit_step(4, "active")
     final_path = f"{base}_final.mp4"
     add_audio_track(video_path, audio_path, final_path, volume=0.8)
-    
+    await emit_step(4, "done")
+
+    # Step 5 — QA
+    await emit_step(5, "active")
+    qa = run_qa(final_path)
+    await emit_step(5, "done")
+
     # Dedup check
     dup = check_duplicate(source_url=f"manual_{niche}_{topic}")
     if dup.get("is_duplicate"):
         return {"success": False, "error": "Duplicate content detected"}
-    
-    # QA check
-    qa = run_qa(final_path)
-    
-    # Analytics
+
+    # Step 6 — Register
+    await emit_step(6, "active")
     video_id = log_video(
         title=script.get("hook", topic)[:60],
         niche=niche,
         agent_type="manual",
         video_path=final_path
     )
-    
-    # Register for dedup
     register_content(
         video_path=final_path,
         source_url=f"manual_{niche}_{topic}",
         agent_type="manual",
     )
-    
-    # Get absolute path and file size
+    await emit_step(6, "done")
+
     abs_path = os.path.abspath(final_path)
     file_size = os.path.getsize(final_path) if os.path.exists(final_path) else 0
-    
+
+    # Step 7 — Done
+    await emit_step(7, "done")
+
     await ws_manager.broadcast({"event": "video:created", "data": {
         "niche": niche, "topic": topic, "hook": script.get("hook", ""),
         "path": abs_path, "video_id": video_id,
     }})
-    
+
     return {
         "success": True,
         "video_id": video_id,
@@ -209,8 +235,17 @@ async def run_podcast_pipeline(payload: dict):
     Run the podcast clipper pipeline.
     Payload: {source, niche, max_clips, template, brand_name, rights_status}
     """
+    import time
+    job_id = f"pod_{int(time.time())}"
+
+    await ws_manager.broadcast({"event": "progress", "data": {
+        "tracker": "pod-progress-tracker", "job": job_id,
+        "step": 0, "status": "active",
+        "step_name": "download", "total_steps": 6,
+    }})
+
     from engines.podcast_pipeline import run_pipeline
-    
+
     result = run_pipeline(
         source=payload.get("source"),
         niche=payload.get("niche", "education"),
@@ -220,7 +255,19 @@ async def run_podcast_pipeline(payload: dict):
         brand_name=payload.get("brand_name", ""),
         rights_status=payload.get("rights_status", "UNKNOWN"),
     )
-    
+
+    # Mark all steps done
+    for i in range(6):
+        await ws_manager.broadcast({"event": "progress", "data": {
+            "tracker": "pod-progress-tracker", "job": job_id,
+            "step": i, "status": "done",
+        }})
+    await ws_manager.broadcast({"event": "progress", "data": {
+        "tracker": "pod-progress-tracker", "job": job_id,
+        "step": 6, "status": "done", "done": True,
+        "success": result.get("status") != "error",
+    }})
+
     await ws_manager.broadcast({"event": "podcast:done", "data": {
         "clips_created": result.get("clips_created", 0),
         "status": result.get("status", ""),
