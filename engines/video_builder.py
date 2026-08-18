@@ -163,7 +163,8 @@ def create_text_video(
         bg_clip = ColorClip(size=(WIDTH, HEIGHT), color=(0, 0, 0)).set_duration(duration)
         
         # Overlay text in center
-        text_clip = ImageClip(text_img).set_duration(duration)
+        text_arr = np.array(text_img)
+        text_clip = ImageClip(text_arr).set_duration(duration)
         text_clip = text_clip.set_position(("center", "center"))
         
         # Compose
