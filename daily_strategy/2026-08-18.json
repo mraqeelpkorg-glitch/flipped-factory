@@ -1,0 +1,71 @@
+{
+  "date": "2026-08-18",
+  "generated_at": "2026-08-18T19:51:08.043270",
+  "target_niches": [
+    "ecommerce",
+    "health_fitness",
+    "education",
+    "productivity"
+  ],
+  "hook_patterns": [
+    "value",
+    "question",
+    "shock"
+  ],
+  "priority_hooks": [
+    {
+      "niche": "ecommerce",
+      "pattern": "value",
+      "hook": "Your complete guide to ecommerce"
+    },
+    {
+      "niche": "health_fitness",
+      "pattern": "question",
+      "hook": "Have you ever wondered about health fitness?"
+    },
+    {
+      "niche": "education",
+      "pattern": "question",
+      "hook": "What's the secret behind education?"
+    },
+    {
+      "niche": "productivity",
+      "pattern": "value",
+      "hook": "3 things you need to know about productivity"
+    }
+  ],
+  "content_mix": {
+    "youtube_clipper": 2,
+    "podcast_clipper": 2,
+    "blog_to_video": 1,
+    "remix_flip": 1,
+    "dub_flip": 1,
+    "data_to_video": 1,
+    "product_compilation": 1,
+    "bts_educational": 0,
+    "trending_niche": 2,
+    "course_teaser": 0,
+    "live_highlights": 1,
+    "screenshot_tutorial": 0
+  },
+  "total_posts_target": 12,
+  "posting_schedule": [
+    {
+      "time": "09:00",
+      "type": "hook_value"
+    },
+    {
+      "time": "12:00",
+      "type": "educational"
+    },
+    {
+      "time": "17:00",
+      "type": "entertainment"
+    },
+    {
+      "time": "21:00",
+      "type": "viral_potential"
+    }
+  ],
+  "notes": "Auto-generated daily strategy. Adjust NICHE_WEIGHTS based on performance."
+}

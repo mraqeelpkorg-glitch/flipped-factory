@@ -544,6 +544,19 @@ def run(
     segments = detect_segments(source_path, min_segment, max_segment)
     segments = segments[:max_clips]
     
+    # Step 2.5: Safety gate on title + segments
+    from engines.safety_gate import check_safety, get_safety_status
+    safety_text = podcast_title + " " + " ".join(s.get("text", "") for s in segments)
+    safety = check_safety(safety_text)
+    safety_status = get_safety_status(safety)
+    if safety_status == "BLOCKED":
+        return {
+            "success": False,
+            "error": f"Safety gate BLOCKED: risk={safety.get('overall_risk', 0)}",
+            "safety": safety,
+        }
+    logger.info(f"Safety: {safety_status} (risk={safety.get('overall_risk', 0):.3f})")
+    
     # Step 3: Pre-check content before creating clips
     content_report = None
     if not skip_check:
@@ -565,11 +578,53 @@ def run(
         
         logger.info(f"Content check PASSED (Score: {content_report['score']}/100)")
     
-    # Step 4: Create clips
+    # Step 4: Create clips with dedup + QA + analytics
+    from engines.dedup_engine import check_duplicate, register_content
+    from engines.shared_qa import run_qa
+    from engines.revenue_tracker import log_video
+    
     clips = []
+    errors = []
     for i, seg in enumerate(segments):
+        # Dedup check per segment
+        dup = check_duplicate(
+            source_url=source,
+            segment_start=seg["start"],
+            segment_end=seg["start"] + seg["duration"],
+        )
+        if dup.get("is_duplicate"):
+            logger.warning(f"Segment duplicate: {seg['start']}-{seg['start'] + seg['duration']}")
+            errors.append({"segment": f"{seg['start']}-{seg['start'] + seg['duration']}", "error": "duplicate"})
+            continue
+        
         result = create_clip(source_path, seg, i + 1, niche, podcast_title)
         if result["success"]:
+            # QA check
+            qa = run_qa(result["path"])
+            if qa["overall"] == "FAILED":
+                errors.append({"segment": i+1, "error": f"qa_failed: {qa['errors']}"})
+                continue
+            
+            # Analytics
+            video_id = log_video(
+                title=result.get("caption", f"Podcast Clip {i+1}")[:60],
+                niche=niche,
+                agent_type="podcast_clipper",
+                video_path=result["path"],
+            )
+            
+            # Register for dedup
+            register_content(
+                video_path=result["path"],
+                source_url=source,
+                segment_start=seg["start"],
+                segment_end=seg["start"] + seg["duration"],
+                agent_type="podcast_clipper",
+            )
+            
+            result["video_id"] = video_id
+            result["qa_status"] = qa["overall"]
+            result["safety_status"] = safety_status
             clips.append(result)
     
     return {
@@ -580,5 +635,7 @@ def run(
         "total_segments": len(segments),
         "clips_created": len(clips),
         "clips": clips,
+        "errors": errors,
         "content_check": content_report["report"] if content_report else None,
+        "source_safety": safety_status,
     }

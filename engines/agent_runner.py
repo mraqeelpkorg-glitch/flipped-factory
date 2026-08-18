@@ -107,8 +107,21 @@ def _process_content(job_id, agent_type, video_path, source_url, auto_publish, r
     if not video_path or not Path(video_path).exists():
         return
 
+    # Safety check (CRITICAL - must run before dedup and QA)
+    from engines.safety_gate import check_safety, get_safety_status
+    start_stage(job_id, "safety_check", stage_order=2)
+    # Extract text from result for safety checking
+    safety_text = result.get("caption", "") or " ".join(result.get("hashtags", [])) or "safe content"
+    safety = check_safety(safety_text)
+    status = get_safety_status(safety)
+    if status == "BLOCKED":
+        fail_stage(job_id, "safety_check", f"Safety blocked: overall_risk={safety.get('overall_risk', 0)}")
+        logger.warning(f"Safety blocked: {video_path} — risk={safety.get('overall_risk', 0)}")
+        return
+    complete_stage(job_id, "safety_check", output_data={"status": status, "overall_risk": safety.get("overall_risk", 0)})
+
     # Dedup
-    start_stage(job_id, "dedup_check", stage_order=2)
+    start_stage(job_id, "dedup_check", stage_order=3)
     dup = check_video_hash(video_path)
     if dup.get("is_duplicate"):
         fail_stage(job_id, "dedup_check", f"Duplicate: {dup.get('reason')}")
@@ -117,7 +130,7 @@ def _process_content(job_id, agent_type, video_path, source_url, auto_publish, r
     complete_stage(job_id, "dedup_check", output_data={"duplicate": False})
 
     # QA
-    start_stage(job_id, "qa_check", stage_order=3)
+    start_stage(job_id, "qa_check", stage_order=4)
     qa = run_qa(video_path)
     if qa["overall"] == "FAILED":
         fail_stage(job_id, "qa_check", f"QA failed: {qa['errors']}")
@@ -135,7 +148,7 @@ def _process_content(job_id, agent_type, video_path, source_url, auto_publish, r
     add_artifact(job_id, video_path, "video")
 
     # Queue for publishing
-    start_stage(job_id, "queue_publish", stage_order=4)
+    start_stage(job_id, "queue_publish", stage_order=5)
     caption = result.get("caption", "")
     hashtags = result.get("hashtags", [])
     queue_for_publishing(
