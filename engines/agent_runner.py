@@ -118,7 +118,23 @@ def _process_content(job_id, agent_type, video_path, source_url, auto_publish, r
         fail_stage(job_id, "safety_check", f"Safety blocked: overall_risk={safety.get('overall_risk', 0)}")
         logger.warning(f"Safety blocked: {video_path} — risk={safety.get('overall_risk', 0)}")
         return
-    complete_stage(job_id, "safety_check", output_data={"status": status, "overall_risk": safety.get("overall_risk", 0)})
+    complete_stage(job_id, "safety_check", output_data={"status": status, "overall_risk": safety.get('overall_risk', 0)})
+
+    # Instagram Community Guidelines check
+    from engines.enhanced_safety import check_instagram_community_guidelines, check_instagram_hook_quality
+    start_stage(job_id, "instagram_guidelines", stage_order=2)
+    ig_check = check_instagram_community_guidelines(safety_text)
+    if not ig_check["compliant"]:
+        fail_stage(job_id, "instagram_guidelines", f"Instagram guidelines violated: {ig_check['violations']}")
+        logger.warning(f"Instagram guidelines violated: {video_path} — {ig_check['violations']}")
+        return
+    # Check hook quality if available
+    hook_text = result.get("hook", "")
+    if hook_text:
+        hook_quality = check_instagram_hook_quality(hook_text)
+        if hook_quality["quality_score"] < 50:
+            logger.warning(f"Hook quality low: {hook_quality['quality_score']}/100")
+    complete_stage(job_id, "instagram_guidelines", output_data={"compliant": True, "score": ig_check.get("risk_level", "low")})
 
     # Dedup
     start_stage(job_id, "dedup_check", stage_order=3)

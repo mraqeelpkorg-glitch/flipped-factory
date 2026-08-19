@@ -132,15 +132,20 @@ def check_audio(audio_stream: dict) -> dict:
     }
 
 
-def check_duration(info: dict, min_duration=3, max_duration=180) -> dict:
-    """Check duration is within Instagram Reels limits (3s-180s)."""
+def check_duration(info: dict, min_duration=3, max_duration=90) -> dict:
+    """Check duration is within Instagram Reels limits (3s-90s per official spec)."""
     fmt = info.get("format", {})
     duration = float(fmt.get("duration", 0))
 
     ok = min_duration <= duration <= max_duration
+    warning = ""
+    if ok and 30 <= duration <= 40:
+        warning = "WARNING: 30-40s is the 'dead zone' — lower completion rates"
+
     return {
         "pass": ok,
         "duration": round(duration, 2),
+        "warning": warning,
         "error": "" if ok else f"Duration {duration:.1f}s not in [{min_duration}, {max_duration}]",
     }
 
@@ -186,6 +191,80 @@ def check_black_bars(video_stream: dict) -> dict:
     return {
         "pass": ok,
         "error": "" if ok else f"Non-standard dimensions {width}x{height} may have black bars",
+    }
+
+
+def check_instagram_optimal_duration(info: dict) -> dict:
+    """Check if duration is in the viral sweet spot (15-30s)."""
+    fmt = info.get("format", {})
+    duration = float(fmt.get("duration", 0))
+
+    if 15 <= duration <= 30:
+        tier = "OPTIMAL"
+        score = 100
+    elif 7 <= duration < 15:
+        tier = "GOOD"
+        score = 80
+    elif 30 < duration <= 60:
+        tier = "ACCEPTABLE"
+        score = 60
+    elif 60 < duration <= 90:
+        tier = "LONG"
+        score = 40
+    else:
+        tier = "POOR"
+        score = 20
+
+    return {
+        "pass": score >= 60,
+        "duration": round(duration, 2),
+        "tier": tier,
+        "score": score,
+        "error": "" if score >= 60 else f"Duration {duration:.1f}s is {tier} — aim for 15-30s",
+    }
+
+
+def check_instagram_file_size(info: dict, max_mb=4000) -> dict:
+    """Check file size against Instagram limit (4GB for Reels)."""
+    fmt = info.get("format", {})
+    size_bytes = int(fmt.get("size", 0))
+    size_mb = size_bytes / (1024 * 1024)
+
+    ok = size_mb <= max_mb
+    return {
+        "pass": ok,
+        "size_mb": round(size_mb, 2),
+        "error": "" if ok else f"File size {size_mb:.1f}MB exceeds Instagram limit {max_mb}MB",
+    }
+
+
+def check_instagram_bitrate(video_stream: dict) -> dict:
+    """Check bitrate meets Instagram recommended minimum (3500 kbps)."""
+    bitrate = int(video_stream.get("bit_rate", 0))
+    min_bitrate = 3_500_000  # 3500 kbps
+
+    ok = bitrate >= min_bitrate or bitrate == 0  # 0 = unknown, skip check
+    return {
+        "pass": ok,
+        "bitrate": bitrate,
+        "bitrate_kbps": round(bitrate / 1000, 1) if bitrate else 0,
+        "error": "" if ok else f"Bitrate {bitrate/1000:.0f}kbps < Instagram recommended {min_bitrate/1000:.0f}kbps",
+    }
+
+
+def check_instagram_safe_zone(video_stream: dict) -> dict:
+    """
+    Basic safe zone check: ensure video is 9:16 vertical format.
+    Full safe zone check requires frame analysis.
+    """
+    width = int(video_stream.get("width", 0))
+    height = int(video_stream.get("height", 0))
+
+    ok = width == 1080 and height == 1920
+    return {
+        "pass": ok,
+        "safe_zone_compliant": ok,
+        "error": "" if ok else f"Video {width}x{height} may not be Instagram-optimized (needs 1080x1920)",
     }
 
 
@@ -285,6 +364,30 @@ def run_qa(
     if not c["pass"]:
         warnings.append(c["error"])
 
+    # 10. Instagram Optimal Duration (15-30s sweet spot)
+    c = check_instagram_optimal_duration(info)
+    checks.append({"name": "instagram_duration", **c})
+    if not c["pass"]:
+        warnings.append(c["error"])
+
+    # 11. Instagram File Size (4GB max)
+    c = check_instagram_file_size(info)
+    checks.append({"name": "instagram_file_size", **c})
+    if not c["pass"]:
+        errors.append(c["error"])
+
+    # 12. Instagram Bitrate (3500 kbps recommended)
+    c = check_instagram_bitrate(vstream)
+    checks.append({"name": "instagram_bitrate", **c})
+    if not c["pass"]:
+        warnings.append(c["error"])
+
+    # 13. Instagram Safe Zone (9:16 vertical)
+    c = check_instagram_safe_zone(vstream)
+    checks.append({"name": "instagram_safe_zone", **c})
+    if not c["pass"]:
+        warnings.append(c["error"])
+
     # Determine overall
     if errors:
         overall = "FAILED"
@@ -293,7 +396,12 @@ def run_qa(
     else:
         overall = "PASSED"
 
-    logger.info(f"QA {overall}: {video_path} ({len(errors)} errors, {len(warnings)} warnings)")
+    # Calculate Instagram compliance score
+    instagram_checks = [c for c in checks if c["name"].startswith("instagram_")]
+    instagram_passed = sum(1 for c in instagram_checks if c["pass"])
+    instagram_score = (instagram_passed / len(instagram_checks) * 100) if instagram_checks else 0
+
+    logger.info(f"QA {overall}: {video_path} ({len(errors)} errors, {len(warnings)} warnings, Instagram: {instagram_score:.0f}%)")
 
     return {
         "overall": overall,
@@ -302,4 +410,9 @@ def run_qa(
         "warnings": warnings,
         "video_path": video_path,
         "file_size": file_size,
+        "instagram_compliance": {
+            "score": instagram_score,
+            "passed": instagram_passed,
+            "total": len(instagram_checks),
+        },
     }

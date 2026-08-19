@@ -16,6 +16,18 @@ WIDTH = 1080
 HEIGHT = 1920
 FPS = 30
 
+# Instagram Safe Zones (from INSTAGRAM_SOURCE_OF_TRUTH.md)
+# Top 10% = username/profile (avoid)
+# Bottom 15% = captions/buttons (avoid)
+# Safe zone: 10-75% vertical
+SAFE_ZONE_TOP = int(HEIGHT * 0.10)      # 192px from top
+SAFE_ZONE_BOTTOM = int(HEIGHT * 0.85)   # 1632px from top
+SAFE_ZONE_HEIGHT = SAFE_ZONE_BOTTOM - SAFE_ZONE_TOP  # 1440px usable
+
+# Text placement limits (with padding)
+TEXT_TOP_LIMIT = SAFE_ZONE_TOP + 50      # 242px from top
+TEXT_BOTTOM_LIMIT = SAFE_ZONE_BOTTOM - 100  # 1532px from top
+
 THEMES = {
     "purple_pink":   {"g1": (124, 58, 237),  "g2": (236, 72, 153),  "accent": (167, 139, 250)},
     "cyan_blue":     {"g1": (6, 182, 212),   "g2": (59, 130, 246),  "accent": (103, 232, 249)},
@@ -126,6 +138,19 @@ def _wrap_text(text, font, max_width, draw):
     return lines
 
 
+def _clamp_to_safe_zone(y, text_height) -> int:
+    """Clamp text position to Instagram safe zone (10-85% vertical)."""
+    y = int(y)
+    text_height = int(text_height)
+    # Ensure text doesn't go above safe zone top
+    if y < TEXT_TOP_LIMIT:
+        y = TEXT_TOP_LIMIT
+    # Ensure text doesn't go below safe zone bottom
+    if y + text_height > TEXT_BOTTOM_LIMIT:
+        y = TEXT_BOTTOM_LIMIT - text_height
+    return y
+
+
 # ─── Section Frames ───────────────────────────────────────────────────────────
 def build_hook_frame(hook_text, theme, emojis, frame_num=0, total_frames=30):
     """Build the hook/intro frame with animated entrance."""
@@ -137,28 +162,31 @@ def build_hook_frame(hook_text, theme, emojis, frame_num=0, total_frames=30):
     draw = ImageDraw.Draw(overlay)
     _draw_decorations(draw, WIDTH, HEIGHT, theme)
 
-    # Big emoji at top
+    # Big emoji at top (within safe zone)
     emoji_font = _get_font(120)
     emoji = random.choice(emojis)
     ew, eh = _text_size(draw, emoji, emoji_font)
-    draw.text(((WIDTH - ew) // 2, 350), emoji, font=emoji_font, fill=(255, 255, 255, 255))
+    emoji_y = _clamp_to_safe_zone(350, eh)
+    draw.text(((WIDTH - ew) // 2, emoji_y), emoji, font=emoji_font, fill=(255, 255, 255, 255))
 
-    # Hook text — large, bold, centered
+    # Hook text — large, bold, centered (within safe zone)
     font_big = _get_font(72, bold=True)
     lines = _wrap_text(hook_text, font_big, 900, draw)
     y = 600
     for line in lines:
         lw, lh = _text_size(draw, line, font_big)
+        y = _clamp_to_safe_zone(y, lh)
         _draw_text_with_outline(draw, (WIDTH - lw) // 2, y, line, font_big, outline_width=4)
         y += lh + 16
 
-    # "Swipe up" hint
+    # "Swipe up" hint (within safe zone)
     hint_font = _get_font(36)
     hint = "👆 Watch this"
     hw, hh = _text_size(draw, hint, hint_font)
-    draw.text(((WIDTH - hw) // 2, HEIGHT - 400), hint, font=hint_font, fill=(*theme["accent"], 200))
+    hint_y = _clamp_to_safe_zone(HEIGHT - 400, hh)
+    draw.text(((WIDTH - hw) // 2, hint_y), hint, font=hint_font, fill=(*theme["accent"], 200))
 
-    # Progress bar at bottom
+    # Progress bar at bottom (below safe zone - intentional)
     progress = min(1.0, (frame_num + 1) / max(total_frames, 1))
     bar_y = HEIGHT - 80
     draw.rounded_rectangle([60, bar_y, WIDTH - 60, bar_y + 12], radius=6, fill=(255, 255, 255, 40))
@@ -179,9 +207,10 @@ def build_body_frame(body_text, section_idx, total_sections, theme, emojis, fram
     draw = ImageDraw.Draw(overlay)
     _draw_decorations(draw, WIDTH, HEIGHT, theme)
 
-    # Section number badge
+    # Section number badge (within safe zone)
     badge_r = 50
     badge_cx, badge_cy = WIDTH // 2, 320
+    badge_cy = _clamp_to_safe_zone(badge_cy, badge_r * 2)
     draw.ellipse(
         [badge_cx - badge_r, badge_cy - badge_r, badge_cx + badge_r, badge_cy + badge_r],
         fill=(*theme["accent"], 220),
@@ -191,18 +220,20 @@ def build_body_frame(body_text, section_idx, total_sections, theme, emojis, fram
     nw, nh = _text_size(draw, num_text, num_font)
     draw.text((badge_cx - nw // 2, badge_cy - nh // 2 - 4), num_text, font=num_font, fill=(255, 255, 255, 255))
 
-    # Emoji
+    # Emoji (within safe zone)
     emoji_font = _get_font(80)
     emoji = emojis[section_idx % len(emojis)]
-    ew, _ = _text_size(draw, emoji, emoji_font)
-    draw.text(((WIDTH - ew) // 2, 420), emoji, font=emoji_font, fill=(255, 255, 255, 255))
+    ew, eh = _text_size(draw, emoji, emoji_font)
+    emoji_y = _clamp_to_safe_zone(420, eh)
+    draw.text(((WIDTH - ew) // 2, emoji_y), emoji, font=emoji_font, fill=(255, 255, 255, 255))
 
-    # Body text
+    # Body text (within safe zone)
     font_med = _get_font(52)
     lines = _wrap_text(body_text, font_med, 880, draw)
     y = 580
     for line in lines[:8]:  # Max 8 lines
         lw, lh = _text_size(draw, line, font_med)
+        y = _clamp_to_safe_zone(y, lh)
         _draw_text_with_outline(draw, (WIDTH - lw) // 2, y, line, font_med, outline_width=3)
         y += lh + 14
 
@@ -239,25 +270,27 @@ def build_cta_frame(cta_text, theme, emojis, frame_num=0, total_frames=30):
     draw = ImageDraw.Draw(overlay)
     _draw_decorations(draw, WIDTH, HEIGHT, theme)
 
-    # Big emoji
+    # Big emoji (within safe zone)
     emoji_font = _get_font(120)
     emoji = "🚀"
-    ew, _ = _text_size(draw, emoji, emoji_font)
-    draw.text(((WIDTH - ew) // 2, 400), emoji, font=emoji_font, fill=(255, 255, 255, 255))
+    ew, eh = _text_size(draw, emoji, emoji_font)
+    emoji_y = _clamp_to_safe_zone(400, eh)
+    draw.text(((WIDTH - ew) // 2, emoji_y), emoji, font=emoji_font, fill=(255, 255, 255, 255))
 
-    # CTA text
+    # CTA text (within safe zone)
     font_big = _get_font(64, bold=True)
     lines = _wrap_text(cta_text, font_big, 880, draw)
     y = 650
     for line in lines:
         lw, lh = _text_size(draw, line, font_big)
+        y = _clamp_to_safe_zone(y, lh)
         _draw_text_with_outline(draw, (WIDTH - lw) // 2, y, line, font_big, outline_width=4)
         y += lh + 16
 
-    # Follow button
+    # Follow button (within safe zone)
     btn_w, btn_h = 400, 80
     btn_x = (WIDTH - btn_w) // 2
-    btn_y = 950
+    btn_y = _clamp_to_safe_zone(950, btn_h)
     draw.rounded_rectangle(
         [btn_x, btn_y, btn_x + btn_w, btn_y + btn_h],
         radius=40,
@@ -269,14 +302,15 @@ def build_cta_frame(cta_text, theme, emojis, frame_num=0, total_frames=30):
     draw.text((btn_x + (btn_w - btw) // 2, btn_y + (btn_h - bth) // 2 - 2),
               btn_text, font=btn_font, fill=(255, 255, 255, 255))
 
-    # Social icons row
+    # Social icons row (within safe zone)
     social_emojis = ["❤️", "💬", "📤", "🔖"]
     social_font = _get_font(48)
     sx = (WIDTH - len(social_emojis) * 100) // 2
+    social_y = _clamp_to_safe_zone(1100, 48)
     for i, se in enumerate(social_emojis):
-        draw.text((sx + i * 100 + 20, 1100), se, font=social_font, fill=(255, 255, 255, 180))
+        draw.text((sx + i * 100 + 20, social_y), se, font=social_font, fill=(255, 255, 255, 180))
 
-    # Progress bar (full)
+    # Progress bar (full) - below safe zone, intentional
     bar_y = HEIGHT - 80
     draw.rounded_rectangle([60, bar_y, WIDTH - 60, bar_y + 12], radius=6, fill=(255, 255, 255, 220))
 

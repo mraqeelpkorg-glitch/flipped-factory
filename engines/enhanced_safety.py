@@ -364,16 +364,182 @@ def enhanced_safety_check(text: str, hook_text: str = "") -> dict:
     }
 
 
+# ─── Instagram Community Guidelines ──────────────────────────────────────────
+
+INSTAGRAM_HATE_SPEECH_KEYWORDS = [
+    "hate", "racist", "discrimination", "bigot", "prejudice",
+    "slur", "offensive", "derogatory", "intolerant",
+]
+
+INSTAGRAM_VIOLENCE_KEYWORDS = [
+    "kill", "murder", "assault", "attack", "bomb",
+    "shoot", "stab", "beat up", "destroy", "violence",
+    "harm", "hurt", "injure", "threat", "terror",
+]
+
+INSTAGRAM_SEXUAL_KEYWORDS = [
+    "nude", "naked", "porn", "sexual", "explicit",
+    "adult content", "nsfw", "indecent", "obscene",
+]
+
+INSTAGRAM_SPAM_KEYWORDS = [
+    "follow4follow", "like4like", "comment4comment",
+    "check bio", "link in bio", "dm for",
+    "follow back", "f4f", "l4l", "spam",
+]
+
+def check_instagram_community_guidelines(text: str) -> dict:
+    """
+    Check content against Instagram Community Guidelines.
+    
+    Returns:
+        {
+            "compliant": bool,
+            "violations": list,
+            "risk_level": "low" | "medium" | "high",
+            "action": "approve" | "review" | "block",
+        }
+    """
+    text_lower = text.lower()
+    violations = []
+    
+    # Check hate speech
+    for kw in INSTAGRAM_HATE_SPEECH_KEYWORDS:
+        if kw in text_lower:
+            violations.append(f"hate_speech: '{kw}'")
+    
+    # Check violence
+    for kw in INSTAGRAM_VIOLENCE_KEYWORDS:
+        if kw in text_lower:
+            violations.append(f"violence: '{kw}'")
+    
+    # Check sexual content
+    for kw in INSTAGRAM_SEXUAL_KEYWORDS:
+        if kw in text_lower:
+            violations.append(f"sexual_content: '{kw}'")
+    
+    # Check spam
+    for kw in INSTAGRAM_SPAM_KEYWORDS:
+        if kw in text_lower:
+            violations.append(f"spam: '{kw}'")
+    
+    # Determine risk
+    if len(violations) >= 3:
+        risk_level = "high"
+        action = "block"
+    elif len(violations) >= 1:
+        risk_level = "medium"
+        action = "review"
+    else:
+        risk_level = "low"
+        action = "approve"
+    
+    return {
+        "compliant": len(violations) == 0,
+        "violations": violations,
+        "risk_level": risk_level,
+        "action": action,
+    }
+
+
+def check_instagram_hook_quality(hook_text: str) -> dict:
+    """
+    Check if hook meets Instagram best practices.
+    
+    Returns:
+        {
+            "quality_score": int (0-100),
+            "issues": list,
+            "suggestions": list,
+        }
+    """
+    issues = []
+    suggestions = []
+    score = 100
+    
+    # Check length (hooks should be 5-15 words)
+    word_count = len(hook_text.split())
+    if word_count < 3:
+        issues.append("Hook too short — aim for 5-15 words")
+        score -= 20
+    elif word_count > 20:
+        issues.append("Hook too long — aim for 5-15 words")
+        score -= 15
+    
+    # Check for question (questions increase engagement)
+    if "?" in hook_text:
+        score += 10
+    
+    # Check for number (numbers increase clarity)
+    if any(char.isdigit() for char in hook_text):
+        score += 5
+    
+    # Check for power words
+    power_words = ["secret", "proven", "ultimate", "best", "worst", "amazing", "shocking"]
+    if any(word in hook_text.lower() for word in power_words):
+        score += 5
+    
+    # Check for clickbait patterns
+    clickbait_patterns = ["you won't believe", "shocking", "unbelievable", "gone wrong"]
+    if any(pattern in hook_text.lower() for pattern in clickbait_patterns):
+        issues.append("Avoid clickbait patterns — Instagram may reduce reach")
+        score -= 15
+    
+    # Cap score
+    score = max(0, min(100, score))
+    
+    return {
+        "quality_score": score,
+        "issues": issues,
+        "suggestions": suggestions,
+    }
+
+
 # ─── Convenience Functions ────────────────────────────────────────────────────
 
 def check_all(text: str, hook_text: str = "") -> dict:
     """Run all enhanced safety checks."""
-    return enhanced_safety_check(text, hook_text)
+    result = enhanced_safety_check(text, hook_text)
+    
+    # Add Instagram community guidelines check
+    ig_guidelines = check_instagram_community_guidelines(text)
+    result["instagram_guidelines"] = ig_guidelines
+    
+    # Add hook quality check
+    if hook_text:
+        hook_quality = check_instagram_hook_quality(hook_text)
+        result["hook_quality"] = hook_quality
+    
+    # Update overall action based on Instagram guidelines
+    if ig_guidelines["action"] == "block":
+        result["action"] = "block"
+        result["overall_safe"] = False
+    elif ig_guidelines["action"] == "review" and result["action"] == "approve":
+        result["action"] = "review"
+    
+    return result
 
 def check_hook(hook_text: str) -> dict:
-    """Check a hook for misleading content."""
-    return check_misleading_hook(hook_text)
+    """Check a hook for misleading content and Instagram quality."""
+    result = check_misleading_hook(hook_text)
+    
+    # Add Instagram hook quality check
+    hook_quality = check_instagram_hook_quality(hook_text)
+    result["instagram_quality"] = hook_quality
+    
+    return result
 
 def check_content_safety(text: str) -> dict:
-    """Check content for private info, impersonation, dangerous challenges."""
-    return enhanced_safety_check(text)
+    """Check content for private info, impersonation, dangerous challenges, and Instagram guidelines."""
+    result = enhanced_safety_check(text)
+    
+    # Add Instagram community guidelines check
+    ig_guidelines = check_instagram_community_guidelines(text)
+    result["instagram_guidelines"] = ig_guidelines
+    
+    # Update overall action based on Instagram guidelines
+    if ig_guidelines["action"] == "block":
+        result["action"] = "block"
+        result["overall_safe"] = False
+    
+    return result
