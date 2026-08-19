@@ -1,149 +1,146 @@
 # BTS EDUCATIONAL — SOURCE OF TRUTH
 ## Agent #8: Behind-the-Scenes → Educational Tutorial
-**Document:** `agents/sources_of_truth/bts_educational_SOURCE_OF_TRUTH.md`
-**Version:** 1.0
+**Version:** 2.0
 **Last Updated:** 2026-08-19
-**Auto-Update:** Daily at 00:00 UTC
-**Purpose:** Complete reference for BTS Educational agent.
 
 ---
 
-# 1. WHAT IS BTS EDUCATIONAL?
+# 🎯 KYUN YEH VIDEO VIRAL HOGA?
 
-BTS Educational takes behind-the-scenes footage and converts it into **educational tutorial content** by:
-1. Taking BTS video path
-2. Transcribing video (or using placeholder)
-3. Generating tutorial script
-4. Creating TTS voiceover
-5. Building video with educational overlays
-6. Merging audio + video
+BTS Educational woh video banata hai jo Instagram par **sab se zyada like, share, save** hoti hai. Kyunki:
 
-**Output:** Vertical educational tutorial video, ready for Instagram Reels.
+1. **REAL PROCESS** - Actual dekho kaise hota hai
+2. **EDUCATIONAL** - Seekhne ko mile
+3. **BEHIND-THE-SCENES** - Jo normal log nahi dekhte
+4. **INSPIRATIONAL** - Motivation mile
+5. **RELATABLE** - "Main bhi kar sakta hoon!"
 
 ---
 
-# 2. WORKFLOW
+# 📱 INSTAGRAM KYA CHAHTA HAI?
 
+## Viral Content Pattern:
 ```
-BTS VIDEO
+FIRST 1-2 SECONDS: "How does this work?"
     ↓
-┌─────────────────────────────────────────┐
-│ 1. INPUT VALIDATION                     │
-│    - File exists?                       │
-│    - Valid format?                      │
-└─────────────────────────────────────────┘
+NEXT 5-10 SECONDS: Show the process
     ↓
-┌─────────────────────────────────────────┐
-│ 2. RIGHTS GATE                          │
-│    - BTS footage authorized?            │
-│    - Block if HIGH risk                 │
-└─────────────────────────────────────────┘
+NEXT 10-20 SECONDS: Explain steps
     ↓
-┌─────────────────────────────────────────┐
-│ 3. SAFETY GATE                          │
-│    - Check content                      │
-│    - Block if violations                │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 4. TRANSCRIBE                           │
-│    - FFmpeg silence detection           │
-│    - Extract text (or placeholder)      │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 5. GENERATE TUTORIAL SCRIPT             │
-│    - AI script generation               │
-│    - Educational format                 │
-│    - Duration: 30-60 seconds            │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 6. TTS + VIDEO                          │
-│    - Voiceover generation               │
-│    - Video with step overlays           │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 7. MERGE + QA                           │
-│    - Video + audio                      │
-│    - Instagram compliance               │
-└─────────────────────────────────────────┘
-    ↓
-OUTPUT: Educational tutorial video
+LAST 2-3 SECONDS: CTA ("Follow for more!")
 ```
 
 ---
 
-# 3. QUALITY STANDARDS
+# 🎬 VIDEO KAISAY BANEGA?
 
-## Video Requirements
-| Parameter | Requirement |
-|-----------|-------------|
-| Resolution | 1080 x 1920 px |
-| Aspect Ratio | 9:16 (vertical) |
-| Duration | 30-60 seconds |
-| Format | MP4 |
+## Step 1: BTS Footage Select
+```
+✅ ACHCHA FOOTAGE:
+- Interesting process
+- Clear visuals
+- Good lighting
+- Stable camera
 
-## Script Requirements
-| Element | Requirement |
-|---------|-------------|
-| Steps | Clear numbered steps |
-| Explanations | Simple, concise |
-| CTA | "Follow for more tips" |
+❌ BURA FOOTAGE:
+- Boring process
+- Dark/blurry
+- Shaky camera
+- Bad audio
+```
 
----
+## Step 2: Educational Angle
+```
+✅ ACHCHA ANGLE:
+- Step-by-step tutorial
+- Tips and tricks
+- Common mistakes
+- Pro secrets
 
-# 4. BEST PRACTICES
-
-## Before Conversion
-1. **Check Rights** — BTS must be authorized
-2. **Verify Quality** — Good enough for tutorial
-3. **Identify Steps** — What can be taught?
-
-## During Conversion
-1. **Clear Steps** — Numbered, simple
-2. **Visual Overlays** — Step numbers on screen
-3. **Natural TTS** — Appropriate rate
-
-## After Conversion
-1. **QA Check** — All standards met
-2. **Register Content** — For dedup
-
----
-
-# 5. COMMON ISSUES
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Steps unclear | Poor transcription | Use placeholder text |
-| Video too long | Too many steps | Limit to 3-5 steps |
-| Boring visuals | No overlays | Add step numbers |
-
----
-
-# 6. PERFORMANCE METRICS
-
-| Metric | Target | Current |
-|--------|--------|---------|
-| Conversion time | < 60s | ~45s |
-| QA pass rate | ≥ 95% | ~90% |
-
----
-
-# 7. EXAMPLE USAGE
-
-```bash
-curl -X POST http://localhost:8003/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent": "bts_educational",
-    "bts_video_path": "data/videos/raw/bts.mp4",
-    "niche": "tech_ai",
-    "tutorial_topic": "How to set up VS Code"
-  }'
+❌ BURA ANGLE:
+- No clear lesson
+- Too complex
+- Boring explanation
+- No value
 ```
 
 ---
 
-**Last verified:** August 19, 2026
+# 📊 QUALITY CHECKLIST
+
+## Video Must Have:
+- [ ] Real BTS footage
+- [ ] Educational value
+- [ ] Clear steps
+- [ ] Vertical format (9:16)
+- [ ] 1080x1920 resolution
+- [ ] 15-60 seconds duration
+- [ ] Inspirational
+- [ ] CTA at end
+
+---
+
+# 🔥 VIRAL HOOKS EXAMPLES
+
+## Health:
+```
+"How I lost 30 pounds in 3 months!"
+"My morning routine that changed EVERYTHING!"
+"The secret to my fitness transformation!"
+```
+
+## Finance:
+```
+"How I make $10K/month from home!"
+"My investment strategy REVEALED!"
+"The trick banks don't want you to know!"
+```
+
+## Tech:
+```
+"How I built this app in 24 hours!"
+"My coding setup that 10x productivity!"
+"The secret to learning programming fast!"
+```
+
+---
+
+# ❌ YEH VIDEO VIRAL NAHI HOGA
+
+## Bad Example:
+**Video:** Random BTS footage
+**Audio:** No explanation
+**Content:** No clear lesson
+
+## Problems:
+- No educational value (skip)
+- Boring footage (ignore)
+- No clear message (confusing)
+
+---
+
+# 🎯 EXAMPLE: YEH VIDEO VIRAL HOGA
+
+## Hook (First 2 seconds):
+**Video:** Final result shown
+**Audio:** "Want to know how I did this?"
+**Text overlay:** "🎯 TUTORIAL"
+
+## Body (Next 25 seconds):
+**Video:** Step-by-step process
+**Audio:** Clear explanation, background music
+**Text:** Each step numbered
+
+## CTA (Last 3 seconds):
+**Video:** "Follow for more tutorials!"
+**Audio:** "Follow for more!"
+**Text:** "FOLLOW 👆"
+
+## Result:
+- **Completion Rate:** 85%
+- **Shares:** 55
+- **Saves:** 200+
+
+---
+
+**Yeh Source of Truth hai. Iske according video banega toh Instagram par VIRAL hoga!**

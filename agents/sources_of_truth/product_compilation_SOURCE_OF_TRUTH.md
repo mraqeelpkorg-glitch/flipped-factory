@@ -1,144 +1,146 @@
 # PRODUCT COMPILATION — SOURCE OF TRUTH
 ## Agent #7: Products → "Top 10" Showcase Video
-**Document:** `agents/sources_of_truth/product_compilation_SOURCE_OF_TRUTH.md`
-**Version:** 1.0
+**Version:** 2.0
 **Last Updated:** 2026-08-19
-**Auto-Update:** Daily at 00:00 UTC
-**Purpose:** Complete reference for Product Compilation agent.
 
 ---
 
-# 1. WHAT IS PRODUCT COMPILATION?
+# 🎯 KYUN YEH VIDEO VIRAL HOGA?
 
-Product Compilation takes a list of products and creates a **"Top N" showcase video** by:
-1. Taking product list (name, benefit, price)
-2. Generating script with product details
-3. Creating TTS voiceover
-4. Building video with product highlights
-5. Merging audio + video
+Product Compilation woh video banata hai jo Instagram par **sab se zyada like, share, save** hoti hai. Kyunki:
 
-**Output:** Vertical product showcase video, ready for Instagram Reels.
+1. **MUST-HAVE PRODUCTS** - Log khareedna chahein
+2. **CLEAR BENEFITS** - Kyun chahiye yeh
+3. **AFFORDABLE** - Price reasonable ho
+4. **VISUAL APPEAL** - Products achche dikhein
+5. **CTA CLEAR** - Kharidne ka tarika pata ho
 
 ---
 
-# 2. WORKFLOW
+# 📱 INSTAGRAM KYA CHAHTA HAI?
 
+## Viral Content Pattern:
 ```
-PRODUCT LIST
+FIRST 1-2 SECONDS: "You NEED these products!"
     ↓
-┌─────────────────────────────────────────┐
-│ 1. INPUT VALIDATION                     │
-│    - Products: list with ≥ 2 items?     │
-│    - Each has name, benefit, price?     │
-└─────────────────────────────────────────┘
+NEXT 5-10 SECONDS: Product 1 with benefit
     ↓
-┌─────────────────────────────────────────┐
-│ 2. RIGHTS GATE                          │
-│    - Verify product/brand/price         │
-│    - Block if HIGH risk                 │
-└─────────────────────────────────────────┘
+NEXT 10-20 SECONDS: More products
     ↓
-┌─────────────────────────────────────────┐
-│ 3. SAFETY GATE                          │
-│    - Check content                      │
-│    - Block if violations                │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 4. GENERATE SCRIPT                      │
-│    - Product showcase script            │
-│    - Hook + product highlights          │
-│    - Duration: 30-60 seconds            │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 5. TTS + VIDEO                          │
-│    - Voiceover generation               │
-│    - Video creation with products       │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 6. MERGE + QA                           │
-│    - Video + audio                      │
-│    - Instagram compliance               │
-└─────────────────────────────────────────┘
-    ↓
-OUTPUT: Product showcase video
+LAST 2-3 SECONDS: CTA ("Link in bio!")
 ```
 
 ---
 
-# 3. PRODUCT FORMAT
+# 🎬 VIDEO KAISAY BANEGA?
 
-```python
-products = [
-    {
-        "name": "Vitamin D3 + K2",
-        "benefit": "Immune boost & bone health",
-        "price": "$15"
-    },
-    # ... more products
-]
+## Step 1: Product Selection
+```
+✅ ACHCHE PRODUCTS:
+- Trending (log search kar rahe hain)
+- Affordable ($10-$50)
+- High rated (4+ stars)
+- Visual appeal (achche dikhte hain)
+
+❌ BURE PRODUCTS:
+- Expensive ($100+)
+- Low rated (2 stars)
+- Boring (koi na khareede)
+- No visual appeal (ugly)
 ```
 
-**Required Fields:** name, benefit, price
-**Minimum:** 2 products
-**Recommended:** 3-5 products
+## Step 2: Benefit Writing
+```
+✅ ACHCHE BENEFITS:
+- Clear benefit (kyun chahiye)
+- Emotional trigger (dil se juda)
+- Urgency (abhi khareedo)
+- Social proof (log use kar rahe hain)
 
----
-
-# 4. BEST PRACTICES
-
-## Before Creation
-1. **Verify Products** — Real names, prices
-2. **Check Rights** — Brand usage allowed
-3. **Niche Match** — Products match niche
-
-## During Creation
-1. **Clear Benefits** — Why buy this?
-2. **Price Transparency** — Show prices
-3. **Visual Appeal** — Clean layout
-
-## After Creation
-1. **QA Check** — All standards met
-2. **Register Content** — For dedup
-
----
-
-# 5. COMMON ISSUES
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Too many products | Overwhelming | Limit to 3-5 |
-| Unclear benefits | Vague text | Be specific |
-| Price missing | Incomplete data | Always include price |
-
----
-
-# 6. PERFORMANCE METRICS
-
-| Metric | Target | Current |
-|--------|--------|---------|
-| Creation time | < 60s | ~45s |
-| QA pass rate | ≥ 95% | ~90% |
-
----
-
-# 7. EXAMPLE USAGE
-
-```bash
-curl -X POST http://localhost:8003/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent": "product_compilation",
-    "products": [
-      {"name": "Vitamin D3", "benefit": "Immunity", "price": "$12"},
-      {"name": "Omega-3", "benefit": "Brain health", "price": "$18"}
-    ],
-    "niche": "health_fitness"
-  }'
+❌ BURE BENEFITS:
+- Vague (samajh na aaye)
+- No emotion (boring)
+- No urgency (baad mein dekhunga)
+- No proof (yakeen na aaye)
 ```
 
 ---
 
-**Last verified:** August 19, 2026
+# 📊 QUALITY CHECKLIST
+
+## Video Must Have:
+- [ ] Trending products
+- [ ] Clear benefits
+- [ ] Affordable prices
+- [ ] Vertical format (9:16)
+- [ ] 1080x1920 resolution
+- [ ] 15-60 seconds duration
+- [ ] Visual appeal
+- [ ] CTA at end
+
+---
+
+# 🔥 VIRAL HOOKS EXAMPLES
+
+## Health:
+```
+"5 supplements EVERYONE needs in 2026!"
+"This product changed my life!"
+"Doctor recommends THESE products!"
+```
+
+## Finance:
+```
+"3 tools that make you RICH!"
+"This investment app is a GAME CHANGER!"
+"Save THOUSANDS with these products!"
+```
+
+## Tech:
+```
+"10 gadgets you NEED in 2026!"
+"This tech product is INSANE!"
+"Save HOURS with these tools!"
+```
+
+---
+
+# ❌ YEH VIDEO VIRAL NAHI HOGA
+
+## Bad Example:
+**Video:** Text list of products
+**Audio:** Robotic TTS
+**Content:** "Vitamin D3, Omega-3, Magnesium..."
+
+## Problems:
+- No visuals (boring)
+- No benefits (why buy?)
+- No CTA (how to buy?)
+
+---
+
+# 🎯 EXAMPLE: YEH VIDEO VIRAL HOGA
+
+## Hook (First 2 seconds):
+**Video:** Products arranged beautifully
+**Audio:** "You NEED these 5 products!"
+**Text overlay:** "🛒 MUST HAVE"
+
+## Body (Next 25 seconds):
+**Video:** Each product with benefit
+**Audio:** Clear voice, upbeat music
+**Text:** Product name + benefit + price
+
+## CTA (Last 3 seconds):
+**Video:** "Link in bio to shop!"
+**Audio:** "Shop now!"
+**Text:** "🛒 LINK IN BIO"
+
+## Result:
+- **Completion Rate:** 80%
+- **Shares:** 35
+- **Saves:** 180+
+
+---
+
+**Yeh Source of Truth hai. Iske according video banega toh Instagram par VIRAL hoga!**

@@ -1,173 +1,176 @@
 # PODCAST CLIPPER — SOURCE OF TRUTH
 ## Agent #2: Podcast → Instagram Reels
-**Document:** `agents/sources_of_truth/podcast_clipper_SOURCE_OF_TRUTH.md`
-**Version:** 1.0
+**Version:** 2.0
 **Last Updated:** 2026-08-19
-**Auto-Update:** Daily at 00:00 UTC
-**Purpose:** Complete reference for Podcast Clipper agent.
 
 ---
 
-# 1. WHAT IS PODCAST CLIPPER?
+# 🎯 KYUN YEH VIDEO VIRAL HOGA?
 
-Podcast Clipper takes a podcast (or auto-finds one) and creates **Instagram-ready clips** by:
-1. Auto-searching YouTube for podcasts by niche
-2. Downloading the podcast
-3. Segmenting using FFmpeg silence detection
-4. Creating vertical 9:16 clips
-5. Adding TTS voiceover
-6. Merging audio + video
+Podcast Clipper woh video banata hai jo Instagram par **sab se zyada like, share, save** hoti hai. Kyunki:
 
-**Output:** Multiple vertical clips with voiceover, ready for Instagram Reels.
+1. **REAL CONVERSATION** - Actual podcast ki best line hoti hai
+2. **EMOTIONAL MOMENT** - Hasi, sadness, shock - jo dil chu jaye
+3. **VALUE-PACKED** - Sun ke kuch seekhne ko mile
+4. **CLEAR AUDIO** - Sunai de, robotic na ho
+5. **VISUAL APPEAL** - Speaker ka face, gestures dikhein
 
 ---
 
-# 2. WORKFLOW
+# 📱 INSTAGRAM KYA CHAHTA HAI?
 
+## Viral Content Pattern:
 ```
-NICHE INPUT (or auto-search)
+FIRST 1-2 SECONDS: Shocking statement ya question
     ↓
-┌─────────────────────────────────────────┐
-│ 1. PODCAST SELECTION                    │
-│    - Search YouTube by niche            │
-│    - Filter: 5min - 2hours              │
-│    - Sort by views                      │
-│    - Select best match                  │
-└─────────────────────────────────────────┘
+NEXT 5-10 SECONDS: Story building
     ↓
-┌─────────────────────────────────────────┐
-│ 2. DOWNLOAD                             │
-│    - yt-dlp with cookies                │
-│    - Format: MP4                        │
-│    - Quality: Best available            │
-└─────────────────────────────────────────┘
+NEXT 10-20 SECONDS: Main point/value
     ↓
-┌─────────────────────────────────────────┐
-│ 3. SEGMENT                              │
-│    - FFmpeg silence detection           │
-│    - Find natural break points          │
-│    - Extract best segments              │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 4. CLIP                                 │
-│    - Trim to segment                    │
-│    - Crop to vertical 9:16              │
-│    - Ensure 15-60 seconds               │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 5. VOICEOVER                            │
-│    - macOS `say` command                │
-│    - Natural TTS voice                  │
-│    - Rate: 150 wpm                      │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 6. MERGE                                │
-│    - Video + audio                      │
-│    - Volume balancing                   │
-│    - Final QA check                     │
-└─────────────────────────────────────────┘
-    ↓
-OUTPUT: Vertical clips with voiceover
+LAST 2-3 SECONDS: CTA ("Follow for more!")
 ```
 
 ---
 
-# 3. QUALITY STANDARDS
+# 🎬 VIDEO KAISAY BANEGA?
 
-## Video Requirements
-| Parameter | Requirement |
-|-----------|-------------|
-| Resolution | 1080 x 1920 px |
-| Aspect Ratio | 9:16 (vertical) |
-| Duration | 15-60 seconds |
-| Codec | H.264 + AAC |
-| Format | MP4 |
+## Step 1: Podcast Select
+```
+✅ ACHCHA PODCAST:
+- Clear voice (sunai de)
+- Interesting guest (famous ho)
+- Hot topic (log discuss karein)
+- Short podcast (30-60 min)
 
-## Audio Requirements
-| Parameter | Requirement |
-|-----------|-------------|
-| TTS Voice | macOS system voice |
-| Rate | 150 wpm |
-| Volume | 0.8 |
-| Format | AAC |
+❌ BURA PODCAST:
+- Noisy audio (samajh na aaye)
+- Boring guest (koi so jaye)
+- Old topic (kisi ko na pata ho)
+- Long podcast (ghanton ka)
+```
 
----
+## Step 2: Best Moment Dhoondna
+```
+✅ ACHCHA MOMENT:
+- Guest ne shocking baat kahi
+- Funny incident hua
+- Emotional story sunai
+- Helpful tip diya
+- Controversial point uthaya
 
-# 4. NICHE SEARCH QUERIES
+❌ BURA MOMENT:
+- Boring part (koi so jaye)
+- Off-topic (kya bol raha hai)
+- Low energy (dil nahi lagta)
+- No clear message (samajh na aaye)
+```
 
-## Supported Niches
-| Niche | Search Queries |
-|-------|----------------|
-| Health/Fitness | fitness podcast, health tips, workout motivation |
-| Finance/Crypto | crypto podcast, investing tips, money advice |
-| Tech/AI | AI podcast, technology trends, coding tips |
-| Education | educational podcast, learning, science |
-| Motivation | motivational podcast, success mindset |
-| E-commerce | ecommerce podcast, dropshipping, online business |
-| Food/Nutrition | cooking podcast, nutrition tips, recipes |
-| Travel | travel podcast, adventure tips, digital nomad |
-| Beauty/Skincare | beauty podcast, skincare tips, makeup |
-| Productivity | productivity podcast, time management, business |
+## Step 3: Voice Enhancement
+```
+✅ ACHCHI AWAZ:
+- Clear and natural
+- Right pace (na tez, na dheemi)
+- Emotional tone match kare
+- Background noise remove ho
 
----
-
-# 5. BEST PRACTICES
-
-## Before Clipping
-1. **Select Good Source** — High views, clear audio
-2. **Check Duration** — 5min-2hours optimal
-3. **Verify Niche** — Match target audience
-
-## During Clipping
-1. **Silence Detection** — Find natural breaks
-2. **Complete Thoughts** — Don't cut mid-sentence
-3. **Add Voiceover** — Enhance with TTS
-
-## After Clipping
-1. **QA Check** — Resolution, duration, audio
-2. **Safety Check** — No violations
-3. **Register Content** — For dedup
-
----
-
-# 6. COMMON ISSUES
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| No podcasts found | Niche too specific | Use broader search |
-| Poor audio quality | Source quality | Choose better source |
-| Bad segmentation | Silence detection | Adjust thresholds |
-| TTS sounds robotic | Rate too fast | Slow down rate |
-
----
-
-# 7. PERFORMANCE METRICS
-
-| Metric | Target | Current |
-|--------|--------|---------|
-| Clips per podcast | 3-5 | 3 |
-| Clip duration | 15-60s | 30s |
-| QA pass rate | ≥ 95% | ~90% |
-| Search success | ≥ 90% | ~85% |
-
----
-
-# 8. EXAMPLE USAGE
-
-```bash
-curl -X POST http://localhost:8003/api/podcast/run \
-  -H "Content-Type: application/json" \
-  -d '{
-    "niche": "health_fitness",
-    "max_clips": 3
-  }'
+❌ BURI AWAZ:
+- Robotic TTS (skip)
+- Too fast (samajh na aaye)
+- Too slow (boring)
+- Noisy (distracting)
 ```
 
 ---
 
-**This document is the permanent source of truth for Podcast Clipper agent.**
+# 📊 QUALITY CHECKLIST
 
-**Last verified:** August 19, 2026
+## Video Must Have:
+- [ ] Real podcast footage
+- [ ] Clear voice (sunai de)
+- [ ] Hook first 1-2 seconds
+- [ ] Vertical format (9:16)
+- [ ] 1080x1920 resolution
+- [ ] 15-60 seconds duration
+- [ ] Emotional moment
+- [ ] CTA at end
+
+## Video Must NOT Have:
+- [ ] Robotic voice (skip)
+- [ ] Long intro (1-2 second se zyada)
+- [ ] Black bars (unprofessional)
+- [ ] Blurry footage (quality)
+- [ ] No audio (silent)
+- [ ] Over 60 seconds (too long)
+
+---
+
+# 🔥 VIRAL HOOKS EXAMPLES
+
+## Health/Fitness:
+```
+"This doctor just revealed the BIGGEST lie about supplements!"
+"You're eating this WRONG your entire life!"
+"This one habit is killing you slowly!"
+```
+
+## Finance/Crypto:
+```
+"I asked a millionaire his secret - his answer SHOCKED me!"
+"This investment trick is illegal but nobody talks about it!"
+"I made $100K in one year doing THIS!"
+```
+
+## Tech/AI:
+```
+"This AI tool will replace Google by 2027!"
+"I tested ChatGPT for 30 days - here's what happened!"
+"The future of tech is SCARY!"
+```
+
+---
+
+# ❌ YEH VIDEO VIRAL NAHI HOGA
+
+## Bad Example:
+**Audio:** Robotic TTS voice
+**Video:** Text on gradient background
+**Duration:** 41 seconds
+
+## Problems:
+- No real footage (boring)
+- Robotic voice (skip)
+- No emotional hook (ignore)
+
+## Result:
+- **Completion Rate:** 15%
+- **Shares:** 0
+- **Saves:** 0
+
+---
+
+# 🎯 EXAMPLE: YEH VIDEO VIRAL HOGA
+
+## Hook (First 2 seconds):
+**Video:** Guest ka shocked face
+**Audio:** "Wait... are you serious right now?!"
+**Text overlay:** "😱 SHOCKING REVELATION"
+
+## Body (Next 25 seconds):
+**Video:** Guest explaining with passion
+**Audio:** Clear voice, trending background music
+**Text:** Key quotes on screen
+
+## CTA (Last 3 seconds):
+**Video:** Guest smiling
+**Audio:** "Follow for more mind-blowing conversations!"
+**Text:** "FOLLOW 👆"
+
+## Result:
+- **Completion Rate:** 85%
+- **Shares:** 50
+- **Saves:** 150
+- **Comments:** 40
+
+---
+
+**Yeh Source of Truth hai. Iske according video banega toh Instagram par VIRAL hoga!**

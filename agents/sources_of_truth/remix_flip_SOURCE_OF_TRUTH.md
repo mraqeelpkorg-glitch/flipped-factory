@@ -1,162 +1,161 @@
 # REMIX FLIP — SOURCE OF TRUTH
 ## Agent #4: Re-edit Existing Video with Fresh Hook
-**Document:** `agents/sources_of_truth/remix_flip_SOURCE_OF_TRUTH.md`
-**Version:** 1.0
+**Version:** 2.0
 **Last Updated:** 2026-08-19
-**Auto-Update:** Daily at 00:00 UTC
-**Purpose:** Complete reference for Remix Flip agent.
 
 ---
 
-# 1. WHAT IS REMIX FLIP?
+# 🎯 KYUN YEH VIDEO VIRAL HOGA?
 
-Remix Flip takes an existing video and creates a **fresh version** by:
-1. Adding a new hook/intro at the beginning
-2. Combining hook with original video
-3. Creating a renewed, engaging piece
+Remix Flip woh video banata hai jo Instagram par **sab se zyada like, share, save** hoti hai. Kyunki:
 
-**Output:** Remixed video with new hook, ready for Instagram Reels.
+1. **FRESH HOOK** - Purane content ko naya banata hai
+2. **EMOTIONAL TRIGGER** - Pehle 2 second mein dil jeet le
+3. **CURIOUSITY** - Dekhne wala sochta hai "aage kya hoga?"
+4. **FAMILIAR + NEW** - Jo pata hai usme twist
+5. **HIGH ENERGY** - Boring moment nahi
 
 ---
 
-# 2. WORKFLOW
+# 📱 INSTAGRAM KYA CHAHTA HAI?
 
+## Viral Content Pattern:
 ```
-EXISTING VIDEO
+FIRST 1-2 SECONDS: Shocking hook
     ↓
-┌─────────────────────────────────────────┐
-│ 1. INPUT VALIDATION                     │
-│    - File exists?                       │
-│    - Valid format?                      │
-└─────────────────────────────────────────┘
+NEXT 3-5 SECONDS: Promise of value
     ↓
-┌─────────────────────────────────────────┐
-│ 2. RIGHTS GATE                          │
-│    - Check copyright risk               │
-│    - Block if HIGH risk                 │
-└─────────────────────────────────────────┘
+NEXT 10-20 SECONDS: Main content
     ↓
-┌─────────────────────────────────────────┐
-│ 3. SAFETY GATE                          │
-│    - Check hook text                    │
-│    - Block if violations                │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 4. GENERATE NEW HOOK                    │
-│    - AI-generated hook                  │
-│    - Or use provided hook               │
-│    - Duration: 3-5 seconds              │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 5. CREATE HOOK VIDEO                    │
-│    - Text overlay                       │
-│    - Gradient background                │
-│    - Safe zone enforcement              │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 6. COMBINE                              │
-│    - Concat hook + original             │
-│    - Smooth transition                  │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 7. DEDUP CHECK                          │
-│    - Check for duplicates               │
-│    - Register content                   │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 8. QA CHECK                             │
-│    - Resolution: 1080x1920              │
-│    - Duration: 15-60 seconds            │
-│    - Audio present                      │
-│    - Instagram compliance               │
-└─────────────────────────────────────────┘
-    ↓
-OUTPUT: Remixed video with new hook
+LAST 2-3 SECONDS: CTA
 ```
 
 ---
 
-# 3. QUALITY STANDARDS
+# 🎬 VIDEO KAISAY BANEGA?
 
-## Video Requirements
-| Parameter | Requirement |
-|-----------|-------------|
-| Resolution | 1080 x 1920 px |
-| Aspect Ratio | 9:16 (vertical) |
-| Duration | 15-60 seconds |
-| Codec | H.264 |
-| Format | MP4 |
+## Step 1: Source Video Select
+```
+✅ ACHCHA VIDEO:
+- Emotional moment
+- Interesting topic
+- Good quality
+- Relatable content
 
-## Hook Requirements
-| Element | Requirement |
-|---------|-------------|
-| Duration | 3-5 seconds |
-| Text | 5-15 words |
-| Style | Attention-grabbing |
-| Placement | Safe zone (10-85%) |
+❌ BURA VIDEO:
+- Boring (koi so jaye)
+- Poor quality (blurry)
+- Offensive (safety block)
+- Too long (60s se zyada)
+```
 
----
+## Step 2: Hook Generation
+```
+✅ ACHCHA HOOK:
+- Shocking statement
+- Question that needs answer
+- Controversial point
+- Emotional trigger
 
-# 4. BEST PRACTICES
+❌ BURA HOOK:
+- "Hello guys" (boring)
+- "Today I will show you" (slow)
+- Long intro (skip)
+- No hook (ignore)
+```
 
-## Before Remixing
-1. **Check Rights** — Must own or have permission
-2. **Check Safety** — No violations in hook
-3. **Choose Good Source** — High quality video
+## Step 3: Combine
+```
+✅ ACHCHA COMBINE:
+- Smooth transition
+- Hook flows into content
+- No jarring cuts
+- Consistent style
 
-## During Remixing
-1. **Create Engaging Hook** — Grab attention fast
-2. **Smooth Transition** — No jarring cuts
-3. **Maintain Quality** — Don't degrade video
-
-## After Remixing
-1. **QA Check** — All standards met
-2. **Safety Check** — No violations
-3. **Register Content** — For dedup
-
----
-
-# 5. COMMON ISSUES
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Jarring transition | Bad concatenation | Smooth fade |
-| Hook too long | Text too much | Shorten to 5 words |
-| Quality drop | Re-encoding | Use same codec |
-| Safety block | Hook violation | Rewrite hook |
-
----
-
-# 6. PERFORMANCE METRICS
-
-| Metric | Target | Current |
-|--------|--------|---------|
-| Remix time | < 30s | ~20s |
-| Hook quality | ≥ 4/5 | ~3.5/5 |
-| QA pass rate | ≥ 95% | ~90% |
-
----
-
-# 7. EXAMPLE USAGE
-
-```bash
-curl -X POST http://localhost:8003/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent": "remix_flip",
-    "video_path": "data/videos/processed/existing.mp4",
-    "niche": "motivation",
-    "new_hook": "You need to see this!"
-  }'
+❌ BURA COMBINE:
+- Abrupt transition
+- Style mismatch
+- Quality drop
+- Audio issues
 ```
 
 ---
 
-**This document is the permanent source of truth for Remix Flip agent.**
+# 📊 QUALITY CHECKLIST
 
-**Last verified:** August 19, 2026
+## Video Must Have:
+- [ ] Compelling hook
+- [ ] Smooth transition
+- [ ] Hook flows into content
+- [ ] Vertical format (9:16)
+- [ ] 1080x1920 resolution
+- [ ] 15-60 seconds duration
+- [ ] Emotional connection
+- [ ] CTA at end
+
+---
+
+# 🔥 VIRAL HOOKS EXAMPLES
+
+## Health/Fitness:
+```
+"This exercise is DESTROYING your joints!"
+"Doctor reveals the TRUTH about weight loss!"
+"You're doing this WRONG every day!"
+```
+
+## Finance/Crypto:
+```
+"This investment trick is ILLEGAL but..."
+"I asked a millionaire his SECRET!"
+"This will make you rich in 2026!"
+```
+
+## Tech/AI:
+```
+"This AI tool will change EVERYTHING!"
+"You're using ChatGPT WRONG!"
+"The future is SCARY!"
+```
+
+---
+
+# ❌ YEH VIDEO VIRAL NAHI HOGA
+
+## Bad Example:
+**Hook:** "Hello guys, today I want to show you..."
+**Video:** Slow intro, no energy
+**Duration:** 60 seconds of boring
+
+## Problems:
+- Boring hook (skip)
+- Slow pacing (ignore)
+- No emotional trigger (boring)
+
+---
+
+# 🎯 EXAMPLE: YEH VIDEO VIRAL HOGA
+
+## Hook (First 2 seconds):
+**Video:** Text: "STOP SCROLLING!"
+**Audio:** "This will change how you see everything!"
+**Text overlay:** "⚠️ IMPORTANT"
+
+## Body (Next 25 seconds):
+**Video:** Original content with energy
+**Audio:** Upbeat music, clear voice
+**Text:** Key points highlighted
+
+## CTA (Last 3 seconds):
+**Video:** "Share with someone who needs this!"
+**Audio:** "Share this!"
+**Text:** "📤 SHARE 👆"
+
+## Result:
+- **Completion Rate:** 75%
+- **Shares:** 60
+- **Saves:** 100
+
+---
+
+**Yeh Source of Truth hai. Iske according video banega toh Instagram par VIRAL hoga!**

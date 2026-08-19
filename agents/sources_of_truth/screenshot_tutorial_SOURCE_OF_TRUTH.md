@@ -1,144 +1,146 @@
 # SCREENSHOT TUTORIAL — SOURCE OF TRUTH
 ## Agent #12: Screenshots → Video Tutorial
-**Document:** `agents/sources_of_truth/screenshot_tutorial_SOURCE_OF_TRUTH.md`
-**Version:** 1.0
+**Version:** 2.0
 **Last Updated:** 2026-08-19
-**Auto-Update:** Daily at 00:00 UTC
-**Purpose:** Complete reference for Screenshot Tutorial agent.
 
 ---
 
-# 1. WHAT IS SCREENSHOT TUTORIAL?
+# 🎯 KYUN YEH VIDEO VIRAL HOGA?
 
-Screenshot Tutorial takes screenshots and creates **video tutorials** by:
-1. Taking screenshots directory
-2. Scanning for privacy issues (passwords, API keys)
-3. Creating slideshow video
-4. Adding TTS voiceover
-5. Merging audio + video
+Screenshot Tutorial woh video banata hai jo Instagram par **sab se zyada like, share, save** hoti hai. Kyunki:
 
-**Output:** Vertical tutorial video from screenshots, ready for Instagram Reels.
+1. **VISUAL TUTORIAL** - Step-by-step dikhe
+2. **EASY TO FOLLOW** - Screenshots se samajh aaye
+3. **SAVEABLE** - Log baad mein dekhein
+4. **EDUCATIONAL** - Kuch seekhne ko mile
+5. **SHAREABLE** - Log doston ko bhejein
 
 ---
 
-# 2. WORKFLOW
+# 📱 INSTAGRAM KYA CHAHTA HAI?
 
+## Viral Content Pattern:
 ```
-SCREENSHOTS DIRECTORY
+FIRST 1-2 SECONDS: "Learn this in 30 seconds!"
     ↓
-┌─────────────────────────────────────────┐
-│ 1. INPUT VALIDATION                     │
-│    - Directory exists?                  │
-│    - Has screenshots (PNG/JPG)?         │
-└─────────────────────────────────────────┘
+NEXT 5-10 SECONDS: Step 1
     ↓
-┌─────────────────────────────────────────┐
-│ 2. PRIVACY SCAN                         │
-│    - Scan for passwords                 │
-│    - Scan for API keys                  │
-│    - Scan for tokens                    │
-│    - Block if found                     │
-└─────────────────────────────────────────┘
+NEXT 10-20 SECONDS: More steps
     ↓
-┌─────────────────────────────────────────┐
-│ 3. RIGHTS GATE                          │
-│    - Screenshots authorized?            │
-│    - Block if HIGH risk                 │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 4. SAFETY GATE                          │
-│    - Check content                      │
-│    - Block if violations                │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 5. GENERATE SCRIPT                      │
-│    - Tutorial steps                     │
-│    - Duration based on screenshots      │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 6. TTS + SLIDESHOW                      │
-│    - Voiceover generation               │
-│    - Slideshow from screenshots         │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 7. MERGE + QA                           │
-│    - Video + audio                      │
-│    - Instagram compliance               │
-└─────────────────────────────────────────┘
-    ↓
-OUTPUT: Tutorial video from screenshots
+LAST 2-3 SECONDS: CTA ("Save for later!")
 ```
 
 ---
 
-# 3. PRIVACY SCAN
+# 🎬 VIDEO KAISAY BANEGA?
 
-**Always scan for:**
-- Passwords (`password`, `pwd`, `passwd`)
-- API keys (`api_key`, `apikey`, `api-key`)
-- Tokens (`token`, `access_token`, `bearer`)
-- Secrets (`secret`, `private_key`)
-- Credit cards (regex pattern)
+## Step 1: Screenshots Select
+```
+✅ ACHCHE SCREENSHOTS:
+- Clear quality
+- Important steps
+- Visual appeal
+- Easy to understand
 
-**If found:** BLOCK the video, never publish sensitive data.
+❌ BURE SCREENSHOTS:
+- Blurry
+- Too many
+- No clear steps
+- Confusing
+```
 
----
+## Step 2: Tutorial Creation
+```
+✅ ACHCHA TUTORIAL:
+- Step-by-step
+- Clear instructions
+- Quick pace
+- Value-packed
 
-# 4. BEST PRACTICES
-
-## Before Creation
-1. **Privacy Scan** — Always scan first
-2. **Check Rights** — Screenshots authorized
-3. **Verify Quality** — Clear screenshots
-
-## During Creation
-1. **Clean Screenshots** — Remove sensitive data
-2. **Clear Steps** — Numbered tutorial
-3. **Natural TTS** — Appropriate rate
-
-## After Creation
-1. **QA Check** — All standards met
-2. **Register Content** — For dedup
-
----
-
-# 5. COMMON ISSUES
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Privacy violation | API key in screenshot | Blur or remove |
-| Too many slides | Overwhelming | Limit to 5-10 |
-| Poor quality | Blurry screenshots | Use better resolution |
-
----
-
-# 6. PERFORMANCE METRICS
-
-| Metric | Target | Current |
-|--------|--------|---------|
-| Creation time | < 60s | ~45s |
-| Privacy scan | 100% | 100% |
-| QA pass rate | ≥ 95% | ~90% |
-
----
-
-# 7. EXAMPLE USAGE
-
-```bash
-curl -X POST http://localhost:8003/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent": "screenshot_tutorial",
-    "screenshots_dir": "data/screenshots/vscode_setup",
-    "niche": "tech_ai",
-    "tutorial_title": "How to set up VS Code for Python"
-  }'
+❌ BURA TUTORIAL:
+- Too slow
+- No clear steps
+- Boring
+- No value
 ```
 
 ---
 
-**Last verified:** August 19, 2026
+# 📊 QUALITY CHECKLIST
+
+## Video Must Have:
+- [ ] Clear screenshots
+- [ ] Step-by-step
+- [ ] Quick pace
+- [ ] Vertical format (9:16)
+- [ ] 1080x1920 resolution
+- [ ] 15-60 seconds duration
+- [ ] Educational value
+- [ ] CTA at end
+
+---
+
+# 🔥 VIRAL HOOKS EXAMPLES
+
+## Health:
+```
+"Set up your fitness app in 30 seconds!"
+"This health trick is EASY!"
+"Learn this health hack NOW!"
+```
+
+## Finance:
+```
+"Set up your budget in 30 seconds!"
+"This finance tool is FREE!"
+"Learn to save money FAST!"
+```
+
+## Tech:
+```
+"Set up VS Code in 30 seconds!"
+"This coding trick is EASY!"
+"Learn to code NOW!"
+```
+
+---
+
+# ❌ YEH VIDEO VIRAL NAHI HOGA
+
+## Bad Example:
+**Video:** Blurry screenshots
+**Audio:** No explanation
+**Content:** Too many steps
+
+## Problems:
+- Can't see (blurry)
+- No explanation (confusing)
+- Too long (skip)
+
+---
+
+# 🎯 EXAMPLE: YEH VIDEO VIRAL HOGA
+
+## Hook (First 2 seconds):
+**Video:** Final result shown
+**Audio:** "Want to learn how?"
+**Text overlay:** "🎯 TUTORIAL"
+
+## Body (Next 25 seconds):
+**Video:** Step-by-step screenshots
+**Audio:** Clear instructions
+**Text:** Each step numbered
+
+## CTA (Last 3 seconds):
+**Video:** "Save this for later!"
+**Audio:** "Save this post!"
+**Text:** "💾 SAVE 👆"
+
+## Result:
+- **Completion Rate:** 85%
+- **Shares:** 40
+- **Saves:** 250+
+
+---
+
+**Yeh Source of Truth hai. Iske according video banega toh Instagram par VIRAL hoga!**

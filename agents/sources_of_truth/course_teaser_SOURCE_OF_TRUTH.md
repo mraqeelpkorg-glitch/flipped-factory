@@ -1,142 +1,146 @@
 # COURSE TEASER — SOURCE OF TRUTH
 ## Agent #10: Course Content → Free Preview Clip
-**Document:** `agents/sources_of_truth/course_teaser_SOURCE_OF_TRUTH.md`
-**Version:** 1.0
+**Version:** 2.0
 **Last Updated:** 2026-08-19
-**Auto-Update:** Daily at 00:00 UTC
-**Purpose:** Complete reference for Course Teaser agent.
 
 ---
 
-# 1. WHAT IS COURSE TEASER?
+# 🎯 KYUN YEH VIDEO VIRAL HOGA?
 
-Course Teaser takes course content and creates **free preview clips** by:
-1. Taking course module text
-2. Generating teaser script
-3. Creating TTS voiceover
-4. Building video with course highlights
-5. Merging audio + video
+Course Teaser woh video banata hai jo Instagram par **sab se zyada like, share, save** hoti hai. Kyunki:
 
-**Output:** Vertical teaser video for course promotion, ready for Instagram Reels.
+1. **TEASER VALUE** - Free mein kuch mile
+2. **CURIOSITY** - Aur seekhna chahein
+3. **CREDIBILITY** - Expert lage
+4. **ACTION-ORIENTED** - Kuch karna chahein
+5. **SHAREABLE** - Log doston ko bhejein
 
 ---
 
-# 2. WORKFLOW
+# 📱 INSTAGRAM KYA CHAHTA HAI?
 
+## Viral Content Pattern:
 ```
-COURSE MODULE TEXT
+FIRST 1-2 SECONDS: "Want to learn this?"
     ↓
-┌─────────────────────────────────────────┐
-│ 1. INPUT VALIDATION                     │
-│    - Module text ≥ 10 chars?            │
-│    - Course name provided?              │
-└─────────────────────────────────────────┘
+NEXT 5-10 SECONDS: Free tip/value
     ↓
-┌─────────────────────────────────────────┐
-│ 2. RIGHTS GATE                          │
-│    - Course material authorized?        │
-│    - Block if HIGH risk                 │
-└─────────────────────────────────────────┘
+NEXT 10-20 SECONDS: More teaser
     ↓
-┌─────────────────────────────────────────┐
-│ 3. SAFETY GATE                          │
-│    - Check content                      │
-│    - Block if violations                │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 4. GENERATE TEASER SCRIPT               │
-│    - AI script generation               │
-│    - Hook + preview + CTA               │
-│    - Duration: 30-60 seconds            │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 5. TTS + VIDEO                          │
-│    - Voiceover generation               │
-│    - Video with course highlights       │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 6. MERGE + QA                           │
-│    - Video + audio                      │
-│    - Instagram compliance               │
-└─────────────────────────────────────────┘
-    ↓
-OUTPUT: Course teaser video
+LAST 2-3 SECONDS: CTA ("Link in bio!")
 ```
 
 ---
 
-# 3. QUALITY STANDARDS
+# 🎬 VIDEO KAISAY BANEGA?
 
-## Video Requirements
-| Parameter | Requirement |
-|-----------|-------------|
-| Resolution | 1080 x 1920 px |
-| Aspect Ratio | 9:16 (vertical) |
-| Duration | 30-60 seconds |
-| Format | MP4 |
+## Step 1: Course Content Select
+```
+✅ ACHCHA CONTENT:
+- High-value tip
+- Easy to understand
+- Quick to implement
+- Results-driven
 
-## Script Requirements
-| Element | Requirement |
-|---------|-------------|
-| Hook | "Want to learn X?" |
-| Preview | Key insight from course |
-| CTA | "Link in bio for full course" |
+❌ BURA CONTENT:
+- Too complex
+- No clear benefit
+- Boring topic
+- No results
+```
 
----
+## Step 2: Teaser Creation
+```
+✅ ACHCHA TEASER:
+- Give value first
+- Create curiosity
+- Show results
+- Clear CTA
 
-# 4. BEST PRACTICES
-
-## Before Creation
-1. **Check Rights** — Course must be authorized
-2. **Verify Content** — Module has value
-3. **Rights Gate** — Check for copyright
-
-## During Creation
-1. **Teasing** — Show value, don't give it all
-2. **Clear CTA** — Direct to course
-3. **Short Duration** — 30-60 seconds
-
-## After Creation
-1. **QA Check** — All standards met
-2. **Register Content** — For dedup
-
----
-
-# 5. COMMON ISSUES
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Too much content | Giving away course | Tease, don't teach |
-| Unclear CTA | No direction | Add "Link in bio" |
-| Boring hook | Generic | Use viral hook |
-
----
-
-# 6. PERFORMANCE METRICS
-
-| Metric | Target | Current |
-|--------|--------|---------|
-| Creation time | < 60s | ~45s |
-| QA pass rate | ≥ 95% | ~90% |
-
----
-
-# 7. EXAMPLE USAGE
-
-```bash
-curl -X POST http://localhost:8003/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent": "course_teaser",
-    "course_module": "In this module you will learn how to build AI agents that can automate your business workflows using free tools.",
-    "course_name": "AI Automation Masterclass",
-    "niche": "education"
-  }'
+❌ BURA TEASER:
+- Give everything (no reason to buy)
+- No value (skip)
+- No curiosity (boring)
+- No CTA (confusing)
 ```
 
 ---
 
-**Last verified:** August 19, 2026
+# 📊 QUALITY CHECKLIST
+
+## Video Must Have:
+- [ ] Free value
+- [ ] Curiosity hook
+- [ ] Clear benefit
+- [ ] Vertical format (9:16)
+- [ ] 1080x1920 resolution
+- [ ] 15-60 seconds duration
+- [ ] Credibility
+- [ ] CTA at end
+
+---
+
+# 🔥 VIRAL HOOKS EXAMPLES
+
+## Health:
+```
+"Free tip: This one food burns fat!"
+"Learn this trick in 30 seconds!"
+"The secret to weight loss REVEALED!"
+```
+
+## Finance:
+```
+"Free lesson: Make your first $100!"
+"This investment trick is FREE!"
+"Learn to save THOUSANDS!"
+```
+
+## Tech:
+```
+"Free tutorial: Build an app in 10 minutes!"
+"This coding trick will 10x your speed!"
+"Learn AI for FREE!"
+```
+
+---
+
+# ❌ YEH VIDEO VIRAL NAHI HOGA
+
+## Bad Example:
+**Video:** "Buy my course!"
+**Audio:** Sales pitch
+**Content:** No free value
+
+## Problems:
+- No value (skip)
+- Too salesy (ignore)
+- No curiosity (boring)
+
+---
+
+# 🎯 EXAMPLE: YEH VIDEO VIRAL HOGA
+
+## Hook (First 2 seconds):
+**Video:** Results shown
+**Audio:** "Want to learn how I did this?"
+**Text overlay:** "🎯 FREE TIP"
+
+## Body (Next 25 seconds):
+**Video:** Step-by-step free tip
+**Audio:** Clear explanation
+**Text:** Each step with benefit
+
+## CTA (Last 3 seconds):
+**Video:** "Want the full course?"
+**Audio:** "Link in bio!"
+**Text:** "🔗 LINK IN BIO"
+
+## Result:
+- **Completion Rate:** 85%
+- **Shares:** 45
+- **Saves:** 220+
+
+---
+
+**Yeh Source of Truth hai. Iske according video banega toh Instagram par VIRAL hoga!**

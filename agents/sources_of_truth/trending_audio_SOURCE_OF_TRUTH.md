@@ -1,142 +1,146 @@
 # TRENDING AUDIO — SOURCE OF TRUTH
 ## Agent #9: Trending Sound + Niche = Viral Content
-**Document:** `agents/sources_of_truth/trending_audio_SOURCE_OF_TRUTH.md`
-**Version:** 1.0
+**Version:** 2.0
 **Last Updated:** 2026-08-19
-**Auto-Update:** Daily at 00:00 UTC
-**Purpose:** Complete reference for Trending Audio agent.
 
 ---
 
-# 1. WHAT IS TRENDING AUDIO?
+# 🎯 KYUN YEH VIDEO VIRAL HOGA?
 
-Trending Audio takes trending TikTok/Reels sounds and creates **niche-specific content** by:
-1. Taking trending audio (or using default)
-2. Selecting topic from niche
-3. Generating script
-4. Creating TTS voiceover
-5. Building video with niche content
-6. Merging audio + video
+Trending Audio woh video banata hai jo Instagram par **sab se zyada like, share, save** hoti hai. Kyunki:
 
-**Output:** Vertical video with trending audio, ready for Instagram Reels.
+1. **TRENDING SOUND** - Jo abhi chal raha ho
+2. **NICHE MATCH** - Audio + content perfect fit
+3. **EMOTIONAL SYNC** - Music aur mood match karein
+4. **SHAREABLE** - Log doston ko bhejein
+5. **SAVEABLE** - Log baad mein sunein
 
 ---
 
-# 2. WORKFLOW
+# 📱 INSTAGRAM KYA CHAHTA HAI?
 
+## Viral Content Pattern:
 ```
-NICHE + TRENDING AUDIO
+FIRST 1-2 SECONDS: Trending sound hook
     ↓
-┌─────────────────────────────────────────┐
-│ 1. INPUT VALIDATION                     │
-│    - Audio exists (or use default)      │
-│    - Niche selected                     │
-└─────────────────────────────────────────┘
+NEXT 5-10 SECONDS: Content build karo
     ↓
-┌─────────────────────────────────────────┐
-│ 2. RIGHTS GATE                          │
-│    - Audio licensed/platform-supported? │
-│    - Block if HIGH risk                 │
-└─────────────────────────────────────────┘
+NEXT 10-20 SECONDS: Main value
     ↓
-┌─────────────────────────────────────────┐
-│ 3. SAFETY GATE                          │
-│    - Check content                      │
-│    - Block if violations                │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 4. SELECT TOPIC                         │
-│    - Niche-based topic selection        │
-│    - Trending content match             │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 5. GENERATE SCRIPT                      │
-│    - AI script generation               │
-│    - Hook + body + CTA                  │
-│    - Duration: 15-30 seconds            │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 6. TTS + VIDEO                          │
-│    - Voiceover generation               │
-│    - Video creation                     │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 7. MERGE + QA                           │
-│    - Video + audio                      │
-│    - Instagram compliance               │
-└─────────────────────────────────────────┘
-    ↓
-OUTPUT: Niche video with trending audio
+LAST 2-3 SECONDS: CTA
 ```
 
 ---
 
-# 3. TRENDING AUDIO SOURCES
+# 🎬 VIDEO KAISAY BANEGA?
 
-| Source | Method |
-|--------|--------|
-| TikTok | Platform API (future) |
-| Instagram Reels | Hashtag research |
-| Default | Built-in audio library |
+## Step 1: Trending Audio Select
+```
+✅ ACHCHA AUDIO:
+- Trending abhi
+- Niche se match kare
+- Emotional ho
+- 15-30 seconds
 
-**Current:** Default audio library (TTS-based)
-**Future:** Platform API integration
+❌ BURA AUDIO:
+- Purana trend
+- Mismatch
+- Boring
+- Bahut lamba
+```
 
----
+## Step 2: Content Creation
+```
+✅ ACHCHA CONTENT:
+- Audio se match kare
+- Visual appeal ho
+- Value-packed
+- Hook strong ho
 
-# 4. BEST PRACTICES
-
-## Before Creation
-1. **Check Audio Rights** — Must be licensed
-2. **Verify Niche Match** — Audio fits niche
-3. **Rights Gate** — Check for copyright
-
-## During Creation
-1. **Trending Hooks** — Use viral patterns
-2. **Niche Relevance** — Content matches audio
-3. **Short Duration** — 15-30 seconds optimal
-
-## After Creation
-1. **QA Check** — All standards met
-2. **Register Content** — For dedup
-
----
-
-# 5. COMMON ISSUES
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Audio not trending | Outdated | Research current trends |
-| Rights violation | Unlicensed audio | Use platform-supported |
-| Niche mismatch | Bad topic selection | Improve topic selection |
-
----
-
-# 6. PERFORMANCE METRICS
-
-| Metric | Target | Current |
-|--------|--------|---------|
-| Creation time | < 45s | ~35s |
-| QA pass rate | ≥ 95% | ~90% |
-
----
-
-# 7. EXAMPLE USAGE
-
-```bash
-curl -X POST http://localhost:8003/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent": "trending_niche",
-    "niche": "health_fitness",
-    "hook": "You need to try this morning routine!"
-  }'
+❌ BURA CONTENT:
+- Audio se mismatch
+- Boring visuals
+- No value
+- Weak hook
 ```
 
 ---
 
-**Last verified:** August 19, 2026
+# 📊 QUALITY CHECKLIST
+
+## Video Must Have:
+- [ ] Trending audio
+- [ ] Niche match
+- [ ] Visual appeal
+- [ ] Vertical format (9:16)
+- [ ] 1080x1920 resolution
+- [ ] 15-60 seconds duration
+- [ ] Emotional sync
+- [ ] CTA at end
+
+---
+
+# 🔥 VIRAL HOOKS EXAMPLES
+
+## Health:
+```
+Trending sound + "This exercise changed my life!"
+Trending sound + "Doctor reveals the truth!"
+Trending sound + "You're doing this WRONG!"
+```
+
+## Finance:
+```
+Trending sound + "I made $10K in one week!"
+Trending sound + "Rich people's secret!"
+Trending sound + "This investment trick works!"
+```
+
+## Tech:
+```
+Trending sound + "AI will change EVERYTHING!"
+Trending sound + "This tool replaced my $500 software!"
+Trending sound + "The future is here!"
+```
+
+---
+
+# ❌ YEH VIDEO VIRAL NAHI HOGA
+
+## Bad Example:
+**Audio:** Old, outdated sound
+**Video:** Mismatched content
+**Duration:** 60 seconds of boring
+
+## Problems:
+- Not trending (no reach)
+- Mismatch (confusing)
+- Boring (skip)
+
+---
+
+# 🎯 EXAMPLE: YEH VIDEO VIRAL HOGA
+
+## Hook (First 2 seconds):
+**Audio:** Trending sound starts
+**Video:** Visual hook (shocking image)
+**Text overlay:** "🔥 TRENDING"
+
+## Body (Next 25 seconds):
+**Audio:** Trending sound continues
+**Video:** Content matches music
+**Text:** Key points on beat
+
+## CTA (Last 3 seconds):
+**Audio:** Sound fades
+**Video:** "Follow for more!"
+**Text:** "FOLLOW 👆"
+
+## Result:
+- **Completion Rate:** 90%
+- **Shares:** 70
+- **Saves:** 180+
+
+---
+
+**Yeh Source of Truth hai. Iske according video banega toh Instagram par VIRAL hoga!**

@@ -1,174 +1,161 @@
 # BLOG TO VIDEO — SOURCE OF TRUTH
 ## Agent #3: Blog Post → Instagram Reel
-**Document:** `agents/sources_of_truth/blog_to_video_SOURCE_OF_TRUTH.md`
-**Version:** 1.0
+**Version:** 2.0
 **Last Updated:** 2026-08-19
-**Auto-Update:** Daily at 00:00 UTC
-**Purpose:** Complete reference for Blog to Video agent.
 
 ---
 
-# 1. WHAT IS BLOG TO VIDEO?
+# 🎯 KYUN YEH VIDEO VIRAL HOGA?
 
-Blog to Video takes a blog post (URL or text) and creates an **Instagram-ready video** by:
-1. Scraping blog content from URL (or using provided text)
-2. Generating a script with AI
-3. Creating TTS voiceover
-4. Building video with Pillow
-5. Merging audio + video
+Blog to Video woh video banata hai jo Instagram par **sab se zyada like, share, save** hoti hai. Kyunki:
 
-**Output:** Vertical video with voiceover, ready for Instagram Reels.
+1. **SCARIAL CONTENT** - Blog ki best info visual mein
+2. **EASY TO CONSUME** - Padhne ki jagah dekho
+3. **VALUE-PACKED** - Kuch seekh ke jao
+4. **ENGAGING VISUALS** - Boring text nahi, attractive graphics
+5. **QUICK TIPS** - 30 seconds mein 3-5 tips
 
 ---
 
-# 2. WORKFLOW
+# 📱 INSTAGRAM KYA CHAHTA HAI?
 
+## Viral Content Pattern:
 ```
-BLOG URL OR TEXT
+FIRST 1-2 SECONDS: "You need to know this!"
     ↓
-┌─────────────────────────────────────────┐
-│ 1. INPUT VALIDATION                     │
-│    - URL or text provided?              │
-│    - Not empty?                         │
-└─────────────────────────────────────────┘
+NEXT 5-10 SECONDS: Problem dikhao
     ↓
-┌─────────────────────────────────────────┐
-│ 2. GET BLOG CONTENT                     │
-│    - Scrape URL (if HTTP)               │
-│    - Extract text                       │
-│    - Or use provided text               │
-└─────────────────────────────────────────┘
+NEXT 10-20 SECONDS: Solution do
     ↓
-┌─────────────────────────────────────────┐
-│ 3. RIGHTS GATE                          │
-│    - Check copyright risk               │
-│    - Block if HIGH risk                 │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 4. SAFETY GATE                          │
-│    - Check content                      │
-│    - Block if violations                │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 5. GENERATE SCRIPT                      │
-│    - AI script generation               │
-│    - Hook, body, CTA                    │
-│    - Duration: 30-60 seconds            │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 6. TTS GENERATION                       │
-│    - macOS `say` command                │
-│    - Natural voice                      │
-│    - Rate: 150 wpm                      │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 7. VIDEO CREATION                       │
-│    - Pillow frame generation            │
-│    - Gradient backgrounds               │
-│    - Text overlays                      │
-│    - Safe zone enforcement              │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 8. MERGE                                │
-│    - Video + audio                      │
-│    - Volume balancing                   │
-└─────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────┐
-│ 9. QA CHECK                             │
-│    - Resolution: 1080x1920              │
-│    - Duration: 15-60 seconds            │
-│    - Audio present                      │
-│    - Instagram compliance               │
-└─────────────────────────────────────────┘
-    ↓
-OUTPUT: Video with voiceover for Instagram
+LAST 2-3 SECONDS: CTA ("Save for later!")
 ```
 
 ---
 
-# 3. QUALITY STANDARDS
+# 🎬 VIDEO KAISAY BANEGA?
 
-## Video Requirements
-| Parameter | Requirement |
-|-----------|-------------|
-| Resolution | 1080 x 1920 px |
-| Aspect Ratio | 9:16 (vertical) |
-| Duration | 30-60 seconds |
-| Codec | H.264 + AAC |
-| Format | MP4 |
+## Step 1: Blog Content
+```
+✅ ACHCHA BLOG:
+- How-to article (seekho)
+- Listicle (top 10 things)
+- Tips & tricks (kaam aaye)
+- Controversial (baat ho)
 
-## Script Requirements
-| Element | Requirement |
-|---------|-------------|
-| Hook | 5-15 words, attention-grabbing |
-| Body | 3-5 key points |
-| CTA | Clear call to action |
-| Duration | 30-60 seconds when spoken |
+❌ BURA BLOG:
+- Opinion piece (subjective)
+- News (outdated ho jayega)
+- Too long (summary nahi ho paaye)
+- No visual potential (boring)
+```
 
----
+## Step 2: Visual Script
+```
+✅ ACHCHA SCRIPT:
+- 3-5 clear points
+- Short sentences
+- Power words use karo
+- Emotional connection
 
-# 4. BEST PRACTICES
+❌ BURA SCRIPT:
+- Too many points (confusing)
+- Long sentences (boring)
+- Boring words (skip)
+- No emotion (ignore)
+```
 
-## Before Conversion
-1. **Check Source** — Ensure blog is accessible
-2. **Verify Rights** — Use rights gate
-3. **Clean Content** — Remove ads, navigation
+## Step 3: Visual Design
+```
+✅ ACHCHA DESIGN:
+- Gradient backgrounds
+- Large, readable text
+- Icons/emojis
+- Animation/movement
 
-## During Conversion
-1. **Generate Good Script** — Clear, concise
-2. **Natural TTS** — Appropriate rate
-3. **Visual Design** — Engaging gradients
-
-## After Conversion
-1. **QA Check** — All standards met
-2. **Safety Check** — No violations
-3. **Register Content** — For dedup
-
----
-
-# 5. COMMON ISSUES
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Scrape fails | URL blocked | Use text input |
-| Script too long | Blog too detailed | Summarize key points |
-| TTS robotic | Rate too fast | Slow down rate |
-| Video boring | No visuals | Add decorations |
-
----
-
-# 6. PERFORMANCE METRICS
-
-| Metric | Target | Current |
-|--------|--------|---------|
-| Conversion time | < 60s | ~45s |
-| Script quality | ≥ 4/5 | ~3.5/5 |
-| QA pass rate | ≥ 95% | ~90% |
-| Scrape success | ≥ 80% | ~75% |
-
----
-
-# 7. EXAMPLE USAGE
-
-```bash
-curl -X POST http://localhost:8003/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent": "blog_to_video",
-    "blog_url_or_text": "https://example.com/blog-post",
-    "niche": "tech_ai",
-    "language": "en"
-  }'
+❌ BURA DESIGN:
+- Plain background (boring)
+- Small text (can't read)
+- No visuals (text-only)
+- Static (no movement)
 ```
 
 ---
 
-**This document is the permanent source of truth for Blog to Video agent.**
+# 📊 QUALITY CHECKLIST
 
-**Last verified:** August 19, 2026
+## Video Must Have:
+- [ ] Clear, concise script
+- [ ] Engaging visuals
+- [ ] Hook first 1-2 seconds
+- [ ] Vertical format (9:16)
+- [ ] 1080x1920 resolution
+- [ ] 15-60 seconds duration
+- [ ] Value-packed content
+- [ ] CTA at end
+
+---
+
+# 🔥 VIRAL HOOKS EXAMPLES
+
+## Health/Fitness:
+```
+"5 foods you should NEVER eat!"
+"This exercise is destroying your back!"
+"The truth about intermittent fasting!"
+```
+
+## Finance/Crypto:
+```
+"3 ways to make passive income in 2026!"
+"This investment mistake is costing you thousands!"
+"The secret to financial freedom!"
+```
+
+## Tech/AI:
+```
+"10 free AI tools you NEED to try!"
+"This trick will 10x your productivity!"
+"The future of technology is here!"
+```
+
+---
+
+# ❌ YEH VIDEO VIRAL NAHI HOGA
+
+## Bad Example:
+**Video:** Text on blue gradient
+**Audio:** Robotic TTS
+**Content:** "5 Morning Stretches for Energy"
+
+## Problems:
+- No real footage (boring)
+- Robotic voice (skip)
+- No visual appeal (ignore)
+
+---
+
+# 🎯 EXAMPLE: YEH VIDEO VIRAL HOGA
+
+## Hook (First 2 seconds):
+**Video:** Shocking statistic large text
+**Audio:** "90% of people make this mistake!"
+**Text overlay:** "⚠️ WARNING"
+
+## Body (Next 25 seconds):
+**Video:** Animated tips appearing one by one
+**Audio:** Clear voice, upbeat music
+**Text:** Each tip with icon
+
+## CTA (Last 3 seconds):
+**Video:** "Save this for later!"
+**Audio:** "Save this post!"
+**Text:** "💾 SAVE 👆"
+
+## Result:
+- **Completion Rate:** 80%
+- **Shares:** 30
+- **Saves:** 200+
+
+---
+
+**Yeh Source of Truth hai. Iske according video banega toh Instagram par VIRAL hoga!**
