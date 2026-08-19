@@ -52,7 +52,7 @@ def run_agent(agent_type: str, auto_publish: bool = False, **kwargs) -> dict:
 
 # ─── Daily Pipeline ───────────────────────────────────────────────────────────
 
-def run_daily_pipeline(videos_per_day: int = 3, languages: list = None):
+def run_daily_pipeline(videos_per_day: int = 3, languages=None):
     """
     Main daily pipeline:
     1. Check trends
@@ -60,6 +60,8 @@ def run_daily_pipeline(videos_per_day: int = 3, languages: list = None):
     3. Create videos using agent_runner (with QA + dedup)
     4. Queue for publishing
     """
+    if languages is None:
+        languages = ["en"]
     from engines.trend_engine import refresh_trends
     from engines.niche_selector import select_niche, select_topic, get_hashtags
     from engines.content_creator import generate_script_with_ai, save_script
@@ -218,7 +220,54 @@ def show_status():
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "help"
 
-    if cmd == "run":
+    if cmd == "chief":
+        # ── CHIEF VIDEO AGENT — Full pipeline ──────────────────────────────
+        if len(sys.argv) < 3:
+            print("Usage: python main.py chief <source> [--agent X] [--niche X] [--language X] [--auto-publish]")
+            print("Example: python main.py chief https://www.youtube.com/watch?v=...")
+            print("Example: python main.py chief /path/to/video.mp4 --agent dub_flip")
+            sys.exit(1)
+        
+        source = sys.argv[2]
+        chief_kwargs = {}
+        i = 3
+        while i < len(sys.argv):
+            if sys.argv[i] == "--agent" and i + 1 < len(sys.argv):
+                chief_kwargs["agent_override"] = sys.argv[i + 1]
+                i += 2
+            elif sys.argv[i] == "--niche" and i + 1 < len(sys.argv):
+                chief_kwargs["niche"] = sys.argv[i + 1]
+                i += 2
+            elif sys.argv[i] == "--language" and i + 1 < len(sys.argv):
+                chief_kwargs["language"] = sys.argv[i + 1]
+                i += 2
+            elif sys.argv[i] == "--auto-publish":
+                chief_kwargs["auto_publish"] = True
+                i += 1
+            elif sys.argv[i] == "--duration" and i + 1 < len(sys.argv):
+                chief_kwargs["capture_duration"] = int(sys.argv[i + 1])
+                i += 2
+            else:
+                i += 1
+        
+        from engines.chief_video_agent import process_source
+        result = process_source(source, **chief_kwargs)
+        
+        print(f"\n{'='*60}")
+        print(f"CHIEF RESULT: {'SUCCESS' if result.get('success') else 'FAILED'}")
+        print(f"{'='*60}")
+        if result.get("success"):
+            print(f"  Job ID:     {result.get('job_id')}")
+            print(f"  Agent:      {result.get('agent_type')}")
+            print(f"  Video:      {result.get('video_path')}")
+            print(f"  QA:         {result.get('qa_result', {}).get('overall')}")
+            print(f"  Published:  {result.get('publish_queued')}")
+        else:
+            print(f"  Error:      {result.get('error')}")
+            print(f"  State:      {result.get('state')}")
+        print(f"{'='*60}\n")
+
+    elif cmd == "run":
         count = int(sys.argv[2]) if len(sys.argv) > 2 else 3
         result = run_daily_pipeline(videos_per_day=count)
         print(f"\nDone: {len(result['videos_created'])} videos created")
@@ -292,29 +341,43 @@ if __name__ == "__main__":
 
     elif cmd == "help":
         print("""
-Flipped Factory — AI Content Factory (12 Agents)
-
-Commands:
-  python main.py run [count]              Create N videos (default: 3)
-  python main.py agent <type> [k=v ...]  Run specific agent
-  python main.py publish                  Publish approved queue items
-  python main.py post <vid> <cap>         Post video to Instagram
-  python main.py status                   Show factory status
-  python main.py setup                    Setup Instagram credentials
-
-Agent Types:
-  youtube_clipper      YouTube video → Reels
-  podcast_clipper      Podcast → Clips with TTS
-  blog_to_video        Blog post → Video
-  remix_flip           Re-edit with new hook
-  dub_flip             Multi-language versions
-  data_to_video        Stats → Infographic
-  product_compilation  Top products showcase
-  bts_educational      BTS → Tutorial
-  trending_niche       Trending audio + topic
-  course_teaser        Course preview clip
-  live_highlights      Live stream → Clips
-  screenshot_tutorial  Screenshots → Video
+╔══════════════════════════════════════════════════════════════╗
+║  FLIPPED FACTORY — AI Content Factory (12 Agents)          ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  CHIEF PIPELINE (Full automation):                           ║
+║    python main.py chief <source> [options]                   ║
+║    Source: YouTube URL, video path, blog URL, text           ║
+║    Options: --agent, --niche, --language, --auto-publish     ║
+║                                                              ║
+║  DIRECT AGENT:                                               ║
+║    python main.py agent <type> [key=value ...]               ║
+║                                                              ║
+║  DAILY PIPELINE:                                             ║
+║    python main.py run [count]                                ║
+║                                                              ║
+║  PUBLISHING:                                                 ║
+║    python main.py publish                                    ║
+║    python main.py post <video_path> <caption>                ║
+║                                                              ║
+║  STATUS:                                                     ║
+║    python main.py status                                     ║
+║                                                              ║
+║  AGENT TYPES:                                                ║
+║    youtube_clipper      YouTube video → Reels                ║
+║    podcast_clipper      Podcast → Clips with TTS             ║
+║    blog_to_video        Blog post → Video                    ║
+║    remix_flip           Re-edit with new hook                ║
+║    dub_flip             Multi-language versions              ║
+║    data_to_video        Stats → Infographic                  ║
+║    product_compilation  Top products showcase                ║
+║    bts_educational      BTS → Tutorial                       ║
+║    trending_niche       Trending audio + topic               ║
+║    course_teaser        Course preview clip                   ║
+║    live_highlights      Live stream → Clips                  ║
+║    screenshot_tutorial  Screenshots → Video                  ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
         """)
 
     else:

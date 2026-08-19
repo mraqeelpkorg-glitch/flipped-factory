@@ -14,13 +14,13 @@ RAW_DIR = Path(__file__).parent.parent / "data" / "videos" / "raw"
 PROCESSED_DIR = Path(__file__).parent.parent / "data" / "videos" / "processed"
 
 
-def run(youtube_url: str, niche: str = "health_fitness", max_clips: int = 3) -> dict:
+def run(youtube_url: str, niche: str = "health_fitness", max_clips: int = 3, video_path: str = "") -> dict:
     """
-    Download YouTube video and create Instagram-ready vertical clips.
+    Download YouTube video (or use pre-captured video) and create Instagram-ready vertical clips.
 
     Steps:
     1. Input validation + rights gate (check YouTube source metadata)
-    2. Download video
+    2. Download or use provided video
     3. Safety gate on transcript
     4. Transcribe + find best segments
     5. Create clips with dedup + QA
@@ -59,13 +59,22 @@ def run(youtube_url: str, niche: str = "health_fitness", max_clips: int = 3) -> 
             }
         logger.info(f"Rights gate: {rights.get('risk_level', 'LOW')}")
 
-        # ── 3. Download video ─────────────────────────────────────────────────
-        dl_result = download_video(youtube_url)
-        if not dl_result.get("success"):
-            return {"success": False, "error": f"Download failed: {dl_result.get('error')}"}
+        # ── 3. Download or use provided video ──────────────────────────────
+        if video_path and Path(video_path).exists():
+            logger.info(f"Using pre-captured video: {video_path}")
+            # Copy to RAW_DIR with timestamp for consistency
+            import shutil
+            dest = RAW_DIR / f"yt_clip_{timestamp}{Path(video_path).suffix}"
+            shutil.copy2(video_path, dest)
+            video_path = str(dest)
+            title = Path(video_path).stem
+        else:
+            dl_result = download_video(youtube_url)
+            if not dl_result.get("success"):
+                return {"success": False, "error": f"Download failed: {dl_result.get('error')}"}
 
-        video_path = dl_result["path"]
-        title = dl_result.get("title", "YouTube Clip")
+            video_path = dl_result["path"]
+            title = dl_result.get("title", "YouTube Clip")
 
         # ── 4. Transcribe ─────────────────────────────────────────────────────
         trans_result = transcribe_video(video_path)

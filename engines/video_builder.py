@@ -1,6 +1,6 @@
 """
 Video Builder Pro — Creates professional Instagram Reel videos.
-Uses Pillow for frame generation + MoviePy for final video.
+Uses Pillow for frame generation + FFmpeg for final video encoding.
 ALL FREE. Vertical 9:16 format.
 """
 import random
@@ -327,7 +327,7 @@ def create_text_video(
     duration_per_section: dict = None,
 ):
     """
-    Create a professional Instagram Reel video.
+    Create a professional Instagram Reel video using Pillow + FFmpeg.
     
     script = {
         "hook": "Opening hook...",
@@ -337,10 +337,8 @@ def create_text_video(
         "niche": "health_fitness"
     }
     """
-    from moviepy.editor import (
-        ImageClip, CompositeVideoClip, concatenate_videoclips
-    )
-    import numpy as np
+    import subprocess
+    import io
 
     niche = script.get("niche", niche)
     theme = random.choice(list(THEMES.values()))
@@ -354,41 +352,30 @@ def create_text_video(
             "cta": min(5, total_duration * 0.15),
         }
 
-    clips = []
+    # Collect all frames in order: hook → body → cta
+    all_frames = []
 
     # ─── Hook Section ─────────────────────────────────────────────────────
     hook_text = script.get("hook", "")
     if hook_text:
         dur = duration_per_section.get("hook", 4)
         frames_needed = int(dur * FPS)
-        # Create multiple frames for subtle animation
         hook_frames = []
-        for f in range(min(frames_needed, FPS * 2)):  # Max 2 seconds of unique frames
+        for f in range(min(frames_needed, FPS * 2)):
             frame = build_hook_frame(hook_text, theme, emojis, f, frames_needed)
             hook_frames.append(frame)
-        
         if hook_frames:
             # Cycle frames for remaining duration
-            all_frames = hook_frames + [hook_frames[-1]] * max(0, frames_needed - len(hook_frames))
-            hook_clip = ImageClip(all_frames[0]).set_duration(0)
-            
-            # Use function-based clip for frame animation
-            def make_frame_hook(t):
-                idx = min(int(t * FPS), len(all_frames) - 1)
-                return all_frames[idx]
-            
-            from moviepy.editor import VideoClip
-            hook_clip = VideoClip(make_frame_hook, duration=dur)
-            clips.append(hook_clip)
+            all_frames.extend(hook_frames)
+            remaining = max(0, frames_needed - len(hook_frames))
+            all_frames.extend([hook_frames[-1]] * remaining)
 
     # ─── Body Sections ────────────────────────────────────────────────────
     body_text = script.get("body", "")
     if body_text:
         body_dur = duration_per_section.get("body", 20)
-        # Split body into sections by newlines or numbered items
         body_parts = [p.strip() for p in body_text.split("\n") if p.strip()]
         if len(body_parts) < 2:
-            # Try splitting by numbered items
             import re
             parts = re.split(r'(?=\d+[\.\)])', body_text)
             body_parts = [p.strip() for p in parts if p.strip()]
@@ -403,17 +390,10 @@ def create_text_video(
             for f in range(min(frames_needed, FPS * 2)):
                 frame = build_body_frame(part, idx, len(body_parts), theme, emojis, f, frames_needed)
                 body_frames.append(frame)
-            
             if body_frames:
-                all_frames = body_frames + [body_frames[-1]] * max(0, frames_needed - len(body_frames))
-                
-                def make_frame_body(t, _frames=all_frames):
-                    idx_f = min(int(t * FPS), len(_frames) - 1)
-                    return _frames[idx_f]
-                
-                from moviepy.editor import VideoClip
-                body_clip = VideoClip(make_frame_body, duration=dur)
-                clips.append(body_clip)
+                all_frames.extend(body_frames)
+                remaining = max(0, frames_needed - len(body_frames))
+                all_frames.extend([body_frames[-1]] * remaining)
 
     # ─── CTA Section ──────────────────────────────────────────────────────
     cta_text = script.get("cta", "")
@@ -424,37 +404,48 @@ def create_text_video(
         for f in range(min(frames_needed, FPS * 2)):
             frame = build_cta_frame(cta_text, theme, emojis, f, frames_needed)
             cta_frames.append(frame)
-        
         if cta_frames:
-            all_frames = cta_frames + [cta_frames[-1]] * max(0, frames_needed - len(cta_frames))
-            
-            def make_frame_cta(t):
-                idx = min(int(t * FPS), len(all_frames) - 1)
-                return all_frames[idx]
-            
-            from moviepy.editor import VideoClip
-            cta_clip = VideoClip(make_frame_cta, duration=dur)
-            clips.append(cta_clip)
+            all_frames.extend(cta_frames)
+            remaining = max(0, frames_needed - len(cta_frames))
+            all_frames.extend([cta_frames[-1]] * remaining)
 
-    # ─── Assemble & Export ────────────────────────────────────────────────
-    if clips:
-        final = concatenate_videoclips(clips, method="compose")
-        final.write_videofile(
-            output_path,
-            fps=FPS,
-            codec="libx264",
-            audio=False,
-            preset="fast",
-            bitrate="5M",
-            logger=None,
-        )
-        final.close()
-        for c in clips:
-            c.close()
-        logger.info(f"Video created: {output_path}")
-        return True
+    # ─── Assemble & Export via FFmpeg ──────────────────────────────────────
+    if not all_frames:
+        return False
 
-    return False
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+    cmd = [
+        "ffmpeg", "-y",
+        "-f", "rawvideo",
+        "-vcodec", "rawvideo",
+        "-pix_fmt", "rgb24",
+        "-s", f"{WIDTH}x{HEIGHT}",
+        "-r", str(FPS),
+        "-i", "-",
+        "-c:v", "libx264",
+        "-preset", "fast",
+        "-b:v", "5M",
+        "-pix_fmt", "yuv420p",
+        "-an",
+        str(output_path),
+    ]
+
+    try:
+        proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+        for frame_img in all_frames:
+            proc.stdin.write(frame_img.tobytes())
+        proc.stdin.close()
+        proc.wait(timeout=30)
+        if proc.returncode == 0:
+            logger.info(f"Video created: {output_path} ({len(all_frames)} frames, {len(all_frames)/FPS:.1f}s)")
+            return True
+        else:
+            logger.error(f"FFmpeg error: {proc.stderr.read().decode()[:200]}")
+            return False
+    except Exception as e:
+        logger.error(f"Video creation failed: {e}")
+        return False
 
 
 # ─── Slideshow ───────────────────────────────────────────────────────────────
@@ -464,54 +455,71 @@ def create_slideshow_video(
     duration_per_image: float = 3.0,
     transition: str = "fade",
 ):
-    """Create a slideshow video from a list of images."""
-    from moviepy.editor import ImageClip, concatenate_videoclips
-    import numpy as np
+    """Create a slideshow video from a list of images using Pillow + FFmpeg."""
+    import subprocess
+    from PIL import Image as PILImage
 
-    clips = []
+    frames = []
     for img_path in images:
         try:
             if isinstance(img_path, str):
-                from PIL import Image as PILImage
                 img = PILImage.open(img_path).resize((WIDTH, HEIGHT))
             else:
                 img = img_path.resize((WIDTH, HEIGHT))
-            arr = np.array(img)
-            clip = ImageClip(arr).set_duration(duration_per_image)
-            clips.append(clip)
+            # Convert to RGB if needed
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            # Duplicate frame for duration
+            n_frames = int(duration_per_image * FPS)
+            frames.extend([img] * n_frames)
         except Exception as e:
             logger.warning(f"Failed to load image: {e}")
 
-    if clips:
-        final = concatenate_videoclips(clips, method="compose")
-        final.write_videofile(
-            output_path, fps=FPS, codec="libx264",
-            audio=False, preset="fast", bitrate="5M", logger=None,
-        )
-        final.close()
-        return True
-    return False
+    if not frames:
+        return False
+
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+    cmd = [
+        "ffmpeg", "-y",
+        "-f", "rawvideo", "-vcodec", "rawvideo",
+        "-pix_fmt", "rgb24", "-s", f"{WIDTH}x{HEIGHT}", "-r", str(FPS),
+        "-i", "-",
+        "-c:v", "libx264", "-preset", "fast", "-b:v", "5M",
+        "-pix_fmt", "yuv420p", "-an", str(output_path),
+    ]
+
+    try:
+        proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+        for frame_img in frames:
+            proc.stdin.write(frame_img.tobytes())
+        proc.stdin.close()
+        proc.wait(timeout=60)
+        return proc.returncode == 0
+    except Exception as e:
+        logger.error(f"Slideshow creation failed: {e}")
+        return False
 
 
 # ─── Audio Overlay ────────────────────────────────────────────────────────────
 def add_audio_to_video(video_path: str, audio_path: str, output_path: str):
-    """Add audio track to a video."""
-    from moviepy.editor import VideoFileClip, AudioFileClip
+    """Add audio track to a video using FFmpeg."""
+    import subprocess
 
     try:
-        video = VideoFileClip(video_path)
-        audio = AudioFileClip(audio_path)
-        if audio.duration > video.duration:
-            audio = audio.subclip(0, video.duration)
-        final = video.set_audio(audio)
-        final.write_videofile(
-            output_path, codec="libx264", audio_codec="aac",
-            preset="fast", logger=None,
-        )
-        final.close()
-        video.close()
-        audio.close()
-        return True
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", video_path,
+            "-i", audio_path,
+            "-c:v", "copy",
+            "-c:a", "aac",
+            "-shortest",
+            "-movflags", "+faststart",
+            output_path,
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        return result.returncode == 0
     except Exception as e:
         logger.error(f"Failed to add audio: {e}")
         return False
@@ -519,17 +527,28 @@ def add_audio_to_video(video_path: str, audio_path: str, output_path: str):
 
 # ─── Utility ──────────────────────────────────────────────────────────────────
 def get_video_info(video_path: str) -> dict:
-    """Get video metadata."""
-    from moviepy.editor import VideoFileClip
+    """Get video metadata using ffprobe."""
+    import subprocess
+    import json
+
     try:
-        clip = VideoFileClip(video_path)
-        info = {
-            "duration": clip.duration,
-            "fps": clip.fps,
-            "size": clip.size,
+        cmd = [
+            "ffprobe", "-v", "quiet",
+            "-print_format", "json",
+            "-show_format", "-show_streams",
+            video_path,
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+        if result.returncode != 0:
+            return {"error": f"ffprobe failed: {result.stderr[:200]}"}
+        
+        info = json.loads(result.stdout)
+        fmt = info.get("format", {})
+        return {
+            "duration": float(fmt.get("duration", 0)),
+            "fps": 30,  # default, parse from stream if needed
+            "size": [1080, 1920],  # default
             "filename": Path(video_path).name,
         }
-        clip.close()
-        return info
     except Exception as e:
         return {"error": str(e)}

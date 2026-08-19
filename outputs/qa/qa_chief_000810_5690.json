@@ -1,0 +1,99 @@
+{
+  "overall": "PASSED_WITH_WARNINGS",
+  "checks": [
+    {
+      "name": "file_exists",
+      "pass": true,
+      "file_size": 119211
+    },
+    {
+      "name": "resolution",
+      "pass": true,
+      "width": 1080,
+      "height": 1920,
+      "error": ""
+    },
+    {
+      "name": "aspect_ratio",
+      "pass": true,
+      "ratio": "1080:1920",
+      "error": ""
+    },
+    {
+      "name": "codec",
+      "pass": true,
+      "codec": "h264",
+      "error": ""
+    },
+    {
+      "name": "audio",
+      "pass": true,
+      "codec": "aac",
+      "sample_rate": 44100,
+      "error": ""
+    },
+    {
+      "name": "duration",
+      "pass": true,
+      "duration": 8.63,
+      "warning": "",
+      "error": ""
+    },
+    {
+      "name": "fps",
+      "pass": true,
+      "fps": 30.0,
+      "error": ""
+    },
+    {
+      "name": "bitrate",
+      "pass": false,
+      "bitrate": 98387,
+      "error": "Bitrate 98387 too low (min 100000)"
+    },
+    {
+      "name": "black_bars",
+      "pass": true,
+      "error": ""
+    },
+    {
+      "name": "instagram_duration",
+      "pass": true,
+      "duration": 8.63,
+      "tier": "GOOD",
+      "score": 80,
+      "error": ""
+    },
+    {
+      "name": "instagram_file_size",
+      "pass": true,
+      "size_mb": 0.11,
+      "error": ""
+    },
+    {
+      "name": "instagram_bitrate",
+      "pass": false,
+      "bitrate": 98387,
+      "bitrate_kbps": 98.4,
+      "error": "Bitrate 98kbps < Instagram recommended 3500kbps"
+    },
+    {
+      "name": "instagram_safe_zone",
+      "pass": true,
+      "safe_zone_compliant": true,
+      "error": ""
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "Bitrate 98387 too low (min 100000)",
+    "Bitrate 98kbps < Instagram recommended 3500kbps"
+  ],
+  "video_path": "/Users/computertrend/Desktop/flipped-factory/data/videos/processed/remix_final_001010.mp4",
+  "file_size": 119211,
+  "instagram_compliance": {
+    "score": 75.0,
+    "passed": 3,
+    "total": 4
+  }
+}
