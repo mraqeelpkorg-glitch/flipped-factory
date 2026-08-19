@@ -14,21 +14,21 @@ PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def trim_video(input_path: str, output_path: str, start: float, end: float) -> bool:
-    """Trim video between start and end timestamps using FFmpeg (preserves audio)."""
+    """Trim video between start and end timestamps using FFmpeg (stream copy for speed)."""
     try:
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         duration = end - start
+        # Use -ss before -i for fast seek, stream copy for speed
         cmd = [
             "ffmpeg", "-y",
             "-ss", str(start),
             "-i", input_path,
             "-t", str(duration),
-            "-c:v", "libx264", "-preset", "fast",
-            "-c:a", "aac", "-b:a", "128k",
+            "-c", "copy",
             "-movflags", "+faststart",
             output_path,
         ]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         return result.returncode == 0 and Path(output_path).exists()
     except Exception as e:
         logger.error(f"Trim failed: {e}")

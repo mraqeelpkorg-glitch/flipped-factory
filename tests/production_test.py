@@ -407,21 +407,29 @@ def _run_live_highlights(video_path, output_dir, start):
     result = live_run(live_video_path=video_path, niche="health_fitness", max_clips=1)
     elapsed = time.time() - start
 
-    if result.get("success") and result.get("video_path"):
-        dest = str(output_dir / "live_highlights_final.mp4")
-        shutil.copy2(result["video_path"], dest)
-        return {
-            "agent": "live_highlights",
-            "status": "PRODUCED",
-            "output_file": dest,
-            "transformation": "Highlight clip extraction with zoom/effects",
-            "qa_status": result.get("qa_status", "?"),
-            "duration": elapsed,
-        }
+    # Agent returns clips as list: [{"path": ..., "qa_status": ...}]
+    clips = result.get("clips", [])
+    if result.get("success") and clips:
+        clip_path = clips[0].get("path", "")
+        if clip_path and os.path.exists(clip_path):
+            dest = str(output_dir / "live_highlights_final.mp4")
+            shutil.copy2(clip_path, dest)
+            return {
+                "agent": "live_highlights",
+                "status": "PRODUCED",
+                "output_file": dest,
+                "transformation": "Highlight clip extraction with zoom/effects",
+                "qa_status": clips[0].get("qa_status", "?"),
+                "duration": elapsed,
+            }
+    
+    error_msg = result.get("error", "")
+    if not error_msg and result.get("errors"):
+        error_msg = str(result["errors"])
     return {
         "agent": "live_highlights",
         "status": "FAILED",
-        "error": result.get("error", ""),
+        "error": error_msg,
         "duration": elapsed,
     }
 

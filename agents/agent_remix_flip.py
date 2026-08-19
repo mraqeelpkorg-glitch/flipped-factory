@@ -84,8 +84,30 @@ def run(video_path: str, niche: str = "motivation", new_hook = None) -> dict:
         hook_video = str(PROCESSED_DIR / f"remix_hook_{timestamp}.mp4")
         create_text_video(hook_script, hook_video)
 
+        # Get source duration and trim to fit Instagram limit (180s - hook duration)
+        import subprocess, json as _json
+        max_total = 180  # Instagram Reels max
+        max_body = max_total - 5  # hook is ~5s
+        
+        source_video_to_concat = video_path
+        try:
+            r = subprocess.run(
+                ["ffprobe", "-v", "quiet", "-show_entries", "format=duration", "-of", "csv=p=0", video_path],
+                capture_output=True, text=True, timeout=10,
+            )
+            source_dur = float(r.stdout.strip()) if r.stdout.strip() else 0
+            if source_dur > max_body:
+                trimmed_path = str(PROCESSED_DIR / f"remix_trimmed_{timestamp}.mp4")
+                from tools.video_editor import trim_video
+                trim_video(video_path, trimmed_path, 0, max_body)
+                if os.path.exists(trimmed_path) and os.path.getsize(trimmed_path) > 1000:
+                    source_video_to_concat = trimmed_path
+                    logger.info(f"Trimmed source from {source_dur:.0f}s to {max_body}s")
+        except Exception as e:
+            logger.warning(f"Duration check failed: {e}")
+
         final_path = str(PROCESSED_DIR / f"remix_final_{timestamp}.mp4")
-        concat_videos([hook_video, video_path], final_path)
+        concat_videos([hook_video, source_video_to_concat], final_path)
 
         # ── 6. Dedup check ────────────────────────────────────────────────────
         dup = check_duplicate(source_url=video_path)
