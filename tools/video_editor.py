@@ -14,46 +14,73 @@ PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def trim_video(input_path: str, output_path: str, start: float, end: float) -> bool:
-    """Trim video between start and end timestamps (seconds)."""
+    """Trim video between start and end timestamps using FFmpeg (preserves audio)."""
     try:
-        from moviepy.editor import VideoFileClip
-        clip = VideoFileClip(input_path).subclip(start, end)
-        clip.write_videofile(output_path, codec="libx264", audio=False, logger=None)
-        clip.close()
-        return True
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        duration = end - start
+        cmd = [
+            "ffmpeg", "-y",
+            "-ss", str(start),
+            "-i", input_path,
+            "-t", str(duration),
+            "-c:v", "libx264", "-preset", "fast",
+            "-c:a", "aac", "-b:a", "128k",
+            "-movflags", "+faststart",
+            output_path,
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        return result.returncode == 0 and Path(output_path).exists()
     except Exception as e:
         logger.error(f"Trim failed: {e}")
         return False
 
 
 def crop_to_vertical(input_path: str, output_path: str) -> bool:
-    """Crop horizontal video to vertical (9:16) from center using FFmpeg."""
+    """Convert any video to vertical 9:16 (1080x1920) using scale+pad, preserving audio."""
     try:
-        # Get video dimensions
-        probe = subprocess.run(
-            ["ffprobe", "-v", "quiet", "-select_streams", "v:0",
-             "-show_entries", "stream=width,height",
-             "-of", "csv=p=0", input_path],
-            capture_output=True, text=True, timeout=10
-        )
-        parts = probe.stdout.strip().split(",")
-        w, h = int(parts[0]), int(parts[1])
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         
-        # Calculate crop for 9:16
-        target_ratio = 9 / 16
-        new_w = int(h * target_ratio)
-        if new_w > w:
-            new_w = w
+        # Check if source has audio
+        has_audio = False
+        try:
+            probe = subprocess.run(
+                ["ffprobe", "-v", "quiet", "-select_streams", "a",
+                 "-show_entries", "stream=codec_type", "-of", "csv=p=0", input_path],
+                capture_output=True, text=True, timeout=10,
+            )
+            has_audio = "audio" in probe.stdout
+        except Exception:
+            pass
         
-        x = (w - new_w) // 2
+        if has_audio:
+            cmd = [
+                "ffmpeg", "-y", "-i", input_path,
+                "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2",
+                "-c:v", "libx264", "-preset", "fast",
+                "-c:a", "aac", "-b:a", "128k",
+                "-movflags", "+faststart",
+                output_path,
+            ]
+        else:
+            # No audio in source — add silent audio track for QA compatibility
+            cmd = [
+                "ffmpeg", "-y", "-i", input_path,
+                "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+                "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2",
+                "-c:v", "libx264", "-preset", "fast",
+                "-c:a", "aac", "-b:a", "128k",
+                "-shortest",
+                "-movflags", "+faststart",
+                output_path,
+            ]
         
-        cmd = [
-            "ffmpeg", "-i", input_path,
-            "-vf", f"crop={new_w}:{h}:{x}:0,scale=1080:1920",
-            "-c:v", "libx264", "-an", "-y", output_path
-        ]
-        result = subprocess.run(cmd, capture_output=True, timeout=60)
-        return result.returncode == 0
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        
+        if result.returncode != 0:
+            logger.error(f"Crop failed: {result.stderr[:200]}")
+            return False
+        
+        return Path(output_path).exists()
     except Exception as e:
         logger.error(f"Crop failed: {e}")
         return False
@@ -164,7 +191,7 @@ def get_video_duration(video_path: str) -> float:
 
 
 def concat_videos(video_paths: list, output_path: str) -> bool:
-    """Concatenate multiple videos using FFmpeg filter_complex (preserves audio)."""
+    """Concatenate multiple videos using FFmpeg filter_complex (preserves audio, normalizes resolution)."""
     import subprocess
     
     try:
@@ -174,7 +201,22 @@ def concat_videos(video_paths: list, output_path: str) -> bool:
         
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         
-        # Build FFmpeg filter_complex for proper concat with audio handling
+        # Get target resolution from first video
+        target_w, target_h = 1080, 1920
+        try:
+            probe = subprocess.run(
+                ["ffprobe", "-v", "quiet", "-select_streams", "v:0",
+                 "-show_entries", "stream=width,height",
+                 "-of", "csv=p=0", str(video_paths[0])],
+                capture_output=True, text=True, timeout=10,
+            )
+            parts = probe.stdout.strip().split(",")
+            if len(parts) == 2:
+                target_w, target_h = int(parts[0]), int(parts[1])
+        except Exception:
+            pass
+        
+        # Build filter_complex: scale each input to target resolution, then concat
         cmd = ["ffmpeg", "-y"]
         for vp in video_paths:
             cmd.extend(["-i", str(vp)])
@@ -182,16 +224,23 @@ def concat_videos(video_paths: list, output_path: str) -> bool:
         n = len(video_paths)
         filter_parts = []
         
-        # Map each input: ensure we have video+audio for each
         for i in range(n):
-            # If input has no audio, generate silent audio
-            filter_parts.append(f"[{i}:v:0]")
-            filter_parts.append(f"[{i}:a:0]")
+            # Scale each video to target resolution + pad if needed
+            filter_parts.append(
+                f"[{i}:v]scale={target_w}:{target_h}:force_original_aspect_ratio=decrease,"
+                f"pad={target_w}:{target_h}:(ow-iw)/2:(oh-ih)/2[s{i}v];"
+            )
+            filter_parts.append(f"[{i}:a]aresample=44100[s{i}a];")
         
-        filter_parts.append(f"concat=n={n}:v=1:a=1[outv][outa]")
+        # Concat all
+        concat_in = "".join(filter_parts)
+        concat_map = ""
+        for i in range(n):
+            concat_map += f"[s{i}v][s{i}a]"
+        concat_map += f"concat=n={n}:v=1:a=1[outv][outa]"
         
         cmd.extend([
-            "-filter_complex", "".join(filter_parts),
+            "-filter_complex", concat_in + concat_map,
             "-map", "[outv]", "-map", "[outa]",
             "-c:v", "libx264", "-preset", "fast",
             "-c:a", "aac", "-b:a", "128k",

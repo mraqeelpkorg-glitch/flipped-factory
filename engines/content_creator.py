@@ -156,7 +156,7 @@ Rules:
     try:
         result = subprocess.run(
             ["curl", "-s", "http://localhost:11434/api/generate",
-             "-d", json.dumps({"model": "llama3", "prompt": prompt, "stream": False})],
+             "-d", json.dumps({"model": "mistral", "prompt": prompt, "stream": False})],
             capture_output=True, text=True, timeout=60
         )
         if result.returncode == 0:
@@ -204,7 +204,7 @@ Return ONLY valid JSON with translated hook, body, and cta fields."""
     try:
         result = subprocess.run(
             ["curl", "-s", "http://localhost:11434/api/generate",
-             "-d", json.dumps({"model": "llama3", "prompt": prompt, "stream": False})],
+             "-d", json.dumps({"model": "mistral", "prompt": prompt, "stream": False})],
             capture_output=True, text=True, timeout=60
         )
         if result.returncode == 0:
